@@ -9,11 +9,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const loginUserName = "admin";
-  const loginPassword = "password";
-
-  const loggedIn = false;
-
   const handleLogin = () => {
     // Perform authentication
     if (username === "admin" && password === "password") {
@@ -25,8 +20,8 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="login-container">
+      <h2 className="login-heading">Login</h2>
       <input
         type="text"
         placeholder="Username"

@@ -11,25 +11,18 @@ import Dashboard from "./components/Dashboard";
 import { useAuth } from "./context/AuthContext";
 
 const App = () => {
-  const isAuthenticated = () => {
-    const { loggedIn } = useAuth();
-    if (loggedIn) {
-      return true;
-    } else {
-      false;
-    }
-  };
+  const { loggedIn } = useAuth();
 
   return (
     <Router>
       <Routes>
         <Route
           path="/"
-          element={isAuthenticated() ? <Navigate to="/dashboard" /> : <Login />}
+          element={loggedIn ? <Navigate to="/dashboard" /> : <Login />}
         />
         <Route
           path="/dashboard"
-          element={isAuthenticated() ? <Dashboard /> : <Navigate to="/" />}
+          element={loggedIn ? <Dashboard /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>
