@@ -6,11 +6,26 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.post("/api/auth", (req, res) => {
+app.post("/api/auth/staff", (req, res) => {
   const { username, password } = req.body;
 
   try {
-    if (username === "admin" && password === "password") {
+    if (username === "staff" && password === "password") {
+      console.log(username, password);
+      res.status(200).json({ message: "success" });
+    } else {
+      res.status(400).json({ error: "Invalid credentials" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/api/auth/doctor", (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    if (username === "doctor" && password === "password") {
       console.log(username, password);
       res.status(200).json({ message: "success" });
     } else {

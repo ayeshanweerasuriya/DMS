@@ -2,33 +2,35 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export function NavBar() {
+export function StaffNavBar() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogOut = () => {
-    logout();
-    navigate("/");
-  };
-
   return (
     <div className="navbar">
-      <Link to={"/appointments"}>
+      <Link to={"/staff-appointments"}>
         <button>Appointments</button>
       </Link>
-      <Link to={"/viewrecords"}>
+      <Link to={"/staff-viewrecords"}>
         <button>View Records</button>
       </Link>
-      <Link to={"/addpatients"}>
+      <Link to={"/staff-addpatients"}>
         <button>Add Patients</button>
       </Link>
-      <Link to={"/updatepatients"}>
+      <Link to={"/staff-updatepatients"}>
         <button>Update Patients</button>
       </Link>
-      <Link to={"/deletepatients"}>
+      <Link to={"/staff-deletepatients"}>
         <button>Delete Patients</button>
       </Link>
-      <button onClick={handleLogOut}>logout</button>
+      <button
+        onClick={() => {
+          logout();
+          navigate("/");
+        }}
+      >
+        logout
+      </button>
     </div>
   );
 }

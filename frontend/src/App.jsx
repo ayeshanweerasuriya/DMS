@@ -6,47 +6,98 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./components/Login";
-import { Dashboard } from "./components/Dashboard";
+import { StaffDashboard } from "./components/StaffDashboard";
+import { DoctorDashboard } from "./components/DoctorDashboard";
 import { useAuth } from "./context/AuthContext";
-import { Appointments } from "./components/Appointments";
-import { ViewRecords } from "./components/ViewRecords";
-import { AddPatients } from "./components/AddPatients";
-import { UpdatePatients } from "./components/UpdatePatients";
-import { DeletePatients } from "./components/DeletePatients";
+import { StaffAppointments } from "./components/StaffAppointments";
+import { StaffViewRecords } from "./components/StaffViewRecords";
+import { StaffAddPatients } from "./components/StaffAddPatients";
+import { StaffUpdatePatients } from "./components/StaffUpdatePatients";
+import { StaffDeletePatients } from "./components/StaffDeletePatients";
 
 const App = () => {
-  const { loggedIn } = useAuth();
+  const { loggedIn, userType } = useAuth();
 
   return (
     <Router>
       <Routes>
         <Route
           path="/"
-          element={loggedIn ? <Navigate to="/dashboard" /> : <Login />}
+          element={
+            loggedIn ? <Navigate to={`/${userType}-dashboard`} /> : <Login />
+          }
+        />
+        <Route path="/staff-login" element={<Login />} />
+        <Route path="/doctor-login" element={<Login />} />
+        <Route
+          path="/staff-dashboard"
+          element={
+            loggedIn && userType === "staff" ? (
+              <StaffDashboard />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
-          path="/dashboard"
-          element={loggedIn ? <Dashboard /> : <Navigate to="/" />}
+          path="/doctor-dashboard"
+          element={
+            loggedIn && userType === "doctor" ? (
+              <DoctorDashboard />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
-          path="/appointments"
-          element={loggedIn ? <Appointments /> : <Navigate to="/" />}
+          path="/staff-appointments"
+          element={
+            loggedIn && userType === "staff" ? (
+              <StaffAppointments />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
-          path="/viewrecords"
-          element={loggedIn ? <ViewRecords /> : <Navigate to="/" />}
+          path="/staff-viewrecords"
+          element={
+            loggedIn && userType === "staff" ? (
+              <StaffViewRecords />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
-          path="/addpatients"
-          element={loggedIn ? <AddPatients /> : <Navigate to="/" />}
+          path="/staff-addpatients"
+          element={
+            loggedIn && userType === "staff" ? (
+              <StaffAddPatients />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
-          path="/updatepatients"
-          element={loggedIn ? <UpdatePatients /> : <Navigate to="/" />}
+          path="/staff-updatepatients"
+          element={
+            loggedIn && userType === "staff" ? (
+              <StaffUpdatePatients />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
-          path="/deletepatients"
-          element={loggedIn ? <DeletePatients /> : <Navigate to="/" />}
+          path="/staff-deletepatients"
+          element={
+            loggedIn && userType === "staff" ? (
+              <StaffDeletePatients />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
       </Routes>
     </Router>
