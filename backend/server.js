@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.post("/", (req, res) => {
+app.post("/api/auth", (req, res) => {
   const { username, password } = req.body;
 
   try {

@@ -5,31 +5,20 @@ import { useAuth } from "../context/AuthContext";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  // const handleLogin = () => {
-  //   // Perform authentication
-  //   if (username === "admin" && password === "password") {
-  // login();
-  // navigate("/dashboard");
-  //   } else {
-  //     alert("Invalid credentials");
-  //   }
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const loginCredentials = { username, password };
-
     try {
-      const response = await fetch("http://localhost:8000/", {
+      const response = await fetch("http://localhost:8000/api/auth", {
         method: "POST",
+        body: JSON.stringify({ username, password }),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(loginCredentials),
       });
 
       if (!response.ok) {
@@ -41,7 +30,6 @@ const Login = () => {
 
       setUsername("");
       setPassword("");
-      console.log("Login success");
       login();
       navigate("/dashboard");
     } catch (error) {
@@ -50,22 +38,26 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2 className="login-heading">Login</h2>
+    <form onSubmit={handleSubmit} className="login-container">
+      <h2>Login</h2>
+      <label htmlFor="username">Username: </label>
       <input
         type="text"
+        id="username"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
+      <label htmlFor="password">Password: </label>
       <input
+        id="password"
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleSubmit}>Login</button>
-    </div>
+      <button>Login</button>
+    </form>
   );
 };
 

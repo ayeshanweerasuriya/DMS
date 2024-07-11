@@ -1,16 +1,21 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  max-width: 200px;
-}
-
-.login-heading {
-  text-align: center;
 }
 
 .login-container input {
   margin: 5px;
   padding: 5px;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: column;
 }
