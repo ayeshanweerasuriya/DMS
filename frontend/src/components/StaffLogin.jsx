@@ -8,18 +8,41 @@ export function StaffLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = () => {
-    // Perform authentication logic here
-    if (username === "staff" && password === "password") {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/auth/staff-login",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            username,
+            password,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      console.log("Response:", json);
+      setUsername("");
+      setPassword("");
       login("staff");
       navigate("/staff-dashboard");
-    } else {
-      alert("Invalid credentials");
+    } catch (error) {
+      console.error("Error during login:", error);
     }
   };
 
   return (
-    <div>
+    <form onSubmit={handleLogin}>
       <h2>Staff Login</h2>
       <input
         type="text"
@@ -33,7 +56,7 @@ export function StaffLogin() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleLogin}>Login</button>
-    </div>
+      <button>Login</button>
+    </form>
   );
 }
