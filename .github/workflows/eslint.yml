@@ -13,10 +13,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.16.0"
+          node-version: "20"
 
-      - name: Install ESLint
-        run: npm install eslint
-
-      - name: Run ESLint
-        run: npx eslint .
+      - name: Install and run ESLint
+        run: |
+          npx install-peerdeps eslint-config-airbnb --dev --yarn
+          npx eslint .
