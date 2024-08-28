@@ -1,42 +1,29 @@
 const express = require("express");
 const cors = require("cors");
+const AuthRouter = require("./routes/auth/auth.js");
+
 const app = express();
+const PORT = process.env.PORT || 8000;
 
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.post("/api/auth/staff-login", (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    if (username === "staff" && password === "password") {
-      console.log(username, password);
-      res.status(200).json({ message: "success" });
-    } else {
-      res.status(400).json({ error: "Invalid credentials" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+app.use((req, res, next) => {
+  console.log(req.method + " - " + req.url);
+  next();
 });
 
-app.post("/api/auth/doctor-login", (req, res) => {
-  const { username, password } = req.body;
+app.use("/auth", AuthRouter);
 
-  try {
-    if (username === "doctor" && password === "password") {
-      console.log(username, password);
-      res.status(200).json({ message: "success" });
-    } else {
-      res.status(400).json({ error: "Invalid credentials" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+app.use((req, res, next) => {
+  res.status(404).send("404 Not Found");
 });
 
-const PORT = process.env.PORT || 8000;
+app.use((error, req, res, next) => {
+  console.error(error.stack);
+  res.status(500).send("Something broke!");
+});
+
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port:`, PORT);
 });
