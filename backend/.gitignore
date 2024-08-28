@@ -1,2 +1,5 @@
-.nav
+# ignore node modules
 node_modules
+
+# ignore .env file
+.env
