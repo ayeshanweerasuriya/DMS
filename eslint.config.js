@@ -1,29 +1,22 @@
 module.exports = [
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
-    rules: {
-      // Add your ESLint rules here
-      semi: ["error", "always"],
-      quotes: ["error", "single"],
-      // ...other rules
-    },
-    env: {
-      browser: true,
-      node: true,
-      es2021: true,
-    },
-    parserOptions: {
+    languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
+      globals: {
+        browser: true,
+        node: true,
+        es2021: true,
+      },
     },
-    extends: [
-      "eslint:recommended",
-      "plugin:react/recommended",
-      // ...other extends
-    ],
-    plugins: [
-      "react",
-      // ...other plugins
-    ],
+    rules: {
+      semi: ["error", "always"],
+      quotes: ["error", "single"],
+    },
+    plugins: {
+      react: require("eslint-plugin-react"),
+    },
+    extends: ["eslint:recommended", "plugin:react/recommended"],
   },
 ];
