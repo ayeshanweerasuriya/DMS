@@ -1,9 +1,13 @@
+import { useState } from "react";
+
 function App() {
+  const [placeholder, setPlaceholder] = useState("null");
   return (
     <>
-      <h1>Entry Point</h1>
-      <p>lorem lorem lorem</p>
-      <span>sample text</span>
+      <h1>Entry: {placeholder}</h1>
+      <button onClick={() => setPlaceholder((currentState) => !currentState)}>
+        Submit
+      </button>
     </>
   );
 }
