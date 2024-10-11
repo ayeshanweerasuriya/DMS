@@ -1,14 +1,9 @@
-import { useState } from "react";
+import MenuBar from "./components/MenuBar";
 
 function App() {
-  const [placeholder, setPlaceholder] = useState("null");
   return (
     <>
-      <h1>Sample text</h1>
-      <h1>Entry: {placeholder}</h1>
-      <button onClick={() => setPlaceholder((currentState) => !currentState)}>
-        Submit
-      </button>
+      <MenuBar />
     </>
   );
 }
