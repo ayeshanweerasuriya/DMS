@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { Avatar, Divider } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import Button from "../button/Button";
-import "./menubar.css";
-const MenuBar = () => {
+import "./MenuBar.css";
+export function MenuBar() {
   return (
     <div className="menu-bar">
       <Avatar size={"large"} icon={<UserOutlined />} />
@@ -30,5 +30,3 @@ const MenuBar = () => {
     </div>
   );
 };
-
-export default MenuBar;
