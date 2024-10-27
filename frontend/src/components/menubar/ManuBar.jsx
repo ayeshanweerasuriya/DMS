@@ -8,7 +8,7 @@ export function MenuBar() {
     <div className="menu-bar">
       <Avatar size={"large"} icon={<UserOutlined />} />
       <br />
-      <span>{"melani@gmail.com"}</span>
+      <span>{"tharushi@gmail.com"}</span>
       <Divider />
       <Link to="/appointments">
         <Button text={"Appointments"} />
