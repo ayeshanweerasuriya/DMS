@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { MenuBar } from "./components/menubar/ManuBar";
+import { MenuBar } from "./components/menubar/MenuBar";
+import { DashComponent } from "./components/dash-component/DashComponent";
 import { Appointments } from "./views/appointments";
 import { ViewRecords } from "./views/ViewRecords";
 import { AddPatients } from "./views/AddPatients";
@@ -16,7 +17,12 @@ function App() {
       <div style={{ display: "flex", minHeight: "100vh" }}>
         <div style={{ width: "300px" }}>
           <MenuBar />
+
+          <DashComponent>
+            <p>Additional Details</p>
+          </DashComponent>
         </div>
+
         <div style={{ flex: 1, padding: "20px" }}>
           <Routes>
             <Route path="/appointments" element={<Appointments />} />
@@ -25,7 +31,6 @@ function App() {
             <Route path="/update-patients" element={<UpdatePatients />} />
             <Route path="/delete-patients" element={<DeletePatients />} />
           </Routes>
-
         </div>
       </div>
     </Router>
@@ -33,7 +38,6 @@ function App() {
     //     </div>
     //   </div>
     // </Router>
-
   );
 }
 
