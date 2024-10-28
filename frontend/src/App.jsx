@@ -9,25 +9,25 @@ import { LogIn } from "./views/login/LogIn";
 
 function App() {
   return (
-    <div>
-    <LogIn />
-    </div>
-    // <Router>
-    //   <div style={{ display: "flex", minHeight: "100vh" }}>
-    //     <div style={{ width: "300px" }}>
-    //       <MenuBar />
-    //     </div>
-    //     <div style={{ flex: 1, padding: "20px" }}>
-    //       <Routes>
-    //         <Route path="/appointments" element={<Appointments />} />
-    //         <Route path="/view-records" element={<ViewRecords />} />
-    //         <Route path="/add-patients" element={<AddPatients />} />
-    //         <Route path="/update-patients" element={<UpdatePatients />} />
-    //         <Route path="/delete-patients" element={<DeletePatients />} />
-    //       </Routes>
-    //     </div>
-    //   </div>
-    // </Router>
+    // <div>
+    // <LogIn />
+    // </div>
+    <Router>
+      <div style={{ display: "flex", minHeight: "100vh" }}>
+        <div style={{ width: "300px" }}>
+          <MenuBar />
+        </div>
+        <div style={{ flex: 1, padding: "20px" }}>
+          <Routes>
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/view-records" element={<ViewRecords />} />
+            <Route path="/add-patients" element={<AddPatients />} />
+            <Route path="/update-patients" element={<UpdatePatients />} />
+            <Route path="/delete-patients" element={<DeletePatients />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 
