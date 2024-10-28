@@ -25,9 +25,15 @@ function App() {
             <Route path="/update-patients" element={<UpdatePatients />} />
             <Route path="/delete-patients" element={<DeletePatients />} />
           </Routes>
+
         </div>
       </div>
     </Router>
+
+    //     </div>
+    //   </div>
+    // </Router>
+
   );
 }
 
