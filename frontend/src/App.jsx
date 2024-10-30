@@ -1,12 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { MenuBar } from "./components/menubar/MenuBar";
-import { DashComponent } from "./components/dash-component/DashComponent";
+import { MenuBar } from "./components/menubar/ManuBar";
 import { Appointments } from "./views/appointments";
 import { ViewRecords } from "./views/ViewRecords";
 import { AddPatients } from "./views/AddPatients";
 import { UpdatePatients } from "./views/UpdatePatients";
 import { DeletePatients } from "./views/DeletePatients";
-import { LogIn } from "./views/login/LogIn";
+// import { LogIn } from "./views/login/LogIn";
 
 function App() {
   return (
@@ -17,12 +16,7 @@ function App() {
       <div style={{ display: "flex", minHeight: "100vh" }}>
         <div style={{ width: "300px" }}>
           <MenuBar />
-
-          <DashComponent>
-            <p>Additional Details</p>
-          </DashComponent>
         </div>
-
         <div style={{ flex: 1, padding: "20px" }}>
           <Routes>
             <Route path="/appointments" element={<Appointments />} />
@@ -34,10 +28,6 @@ function App() {
         </div>
       </div>
     </Router>
-
-    //     </div>
-    //   </div>
-    // </Router>
   );
 }
 
