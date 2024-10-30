@@ -3,6 +3,7 @@ import { Avatar, Divider } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import Button from "../button/Button";
 import "./MenuBar.css";
+
 export function MenuBar() {
   return (
     <div className="menu-bar">
