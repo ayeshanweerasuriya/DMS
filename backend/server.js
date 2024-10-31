@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const AuthRouter = require("./routes/auth/auth.js");
+const connectToDatabase = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -24,6 +25,8 @@ app.use((error, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port:`, PORT);
+connectToDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port:`, PORT);
+  });
 });
