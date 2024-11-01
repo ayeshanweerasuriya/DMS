@@ -9,6 +9,7 @@ import {
   MenuFoldOutlined,
   DeleteOutlined,
   UserAddOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { Appointments } from "./views/appointments/Appointments";
 import { ViewRecords } from "./views/view-patients/ViewRecords";
@@ -52,7 +53,7 @@ const App = () => {
   ];
 
   return (
-    <Layout style={{ height: "100vh" }}>
+    <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
       <Sider
         style={{ backgroundColor: "#fff" }}
         trigger={null}
@@ -66,6 +67,9 @@ const App = () => {
           defaultSelectedKeys={["1"]}
           items={menuItems}
         />
+        <div className="logout-btn">
+          <LogoutOutlined /> Logout
+        </div>
       </Sider>
       <Layout>
         <Header

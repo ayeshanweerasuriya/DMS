@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const AuthRouter = require("./routes/auth/auth.js");
+// const PatientRouter = require("./routes/patient/patient.js");
+const AppointmentRouter = require("./routes/appointment/appointment.js");
+// const CalendarRouter = require("./routes/calendar/calendar.js");
 const connectToDatabase = require("./db");
 
 const app = express();
@@ -15,6 +18,9 @@ app.use((req, res, next) => {
 });
 
 app.use("/auth", AuthRouter);
+// app.use("api/patient", PatientRouter);
+app.use("/api/appointment", AppointmentRouter);
+// app.use("api/calendar", CalendarRouter);
 
 app.use((req, res, next) => {
   res.status(404).send("404 Not Found");

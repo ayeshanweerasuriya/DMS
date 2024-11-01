@@ -45,6 +45,6 @@ export function DropdownMenu({
 
 DropdownMenu.propTypes = {
   items: PropTypes.array.isRequired,
-  defaultLabel: PropTypes.string.isRequired,
+  defaultLabel: PropTypes.string,
   onItemSelect: PropTypes.func,
 };
