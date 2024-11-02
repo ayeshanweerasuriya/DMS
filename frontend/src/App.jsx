@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { Button, Layout, Menu, theme, ConfigProvider } from "antd";
 import { useState } from "react";
 import {
@@ -20,33 +20,34 @@ import { DeletePatients } from "./views/delete-patients/DeletePatients";
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
+  const location = useLocation();
 
   const borderRadiusLG = "25px";
   const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
 
   const menuItems = [
     {
-      key: "1",
+      key: "/appointments",
       icon: <UsergroupAddOutlined />,
       label: <Link to="/appointments">Appointments</Link>,
     },
     {
-      key: "2",
+      key: "/view-records",
       icon: <FolderViewOutlined />,
       label: <Link to="/view-records">View Records</Link>,
     },
     {
-      key: "3",
+      key: "/add-patients",
       icon: <UserAddOutlined />,
       label: <Link to="/add-patients">Add Patients</Link>,
     },
     {
-      key: "4",
+      key: "/update-patients",
       icon: <UpCircleOutlined />,
       label: <Link to="/update-patients">Update Patients</Link>,
     },
     {
-      key: "5",
+      key: "/delete-patients",
       icon: <DeleteOutlined />,
       label: <Link to="/delete-patients">Delete Patients</Link>,
     },
@@ -71,7 +72,8 @@ const App = () => {
           <Menu
             theme="light"
             mode="inline"
-            defaultSelectedKeys={["1"]}
+            // defaultSelectedKeys={["1"]}
+            selectedKeys={[location.pathname]}
             items={menuItems}
           />
           <div className="logout-btn">
@@ -103,6 +105,7 @@ const App = () => {
               minHeight: 280,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              overflow: "auto",
             }}
           >
             <Routes>

@@ -19,7 +19,7 @@ export function TableComponent({ columns = [], data = [] }) {
         },
       }}
     >
-      <Table columns={columns} dataSource={data} />;
+      <Table columns={columns} dataSource={data} />
     </ConfigProvider>
   );
 }
