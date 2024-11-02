@@ -1,5 +1,6 @@
-import { Divider, Typography, Flex, Row, Col, Space } from "antd";
-import { Input } from "antd";
+import { Divider, Typography, Flex, Row, Col, Space, Button } from "antd";
+import { Input, Tooltip } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
 import { TableComponent } from "../../components/table/TableComponent";
 
@@ -92,6 +93,11 @@ export function ViewRecords() {
                 { key: "3", label: "Date" },
               ]}
             />
+          </Col>
+          <Col style={{ marginLeft: "auto" }}>
+            <Tooltip title="Add Record">
+              <Button type="primary" icon={<PlusOutlined />} />
+            </Tooltip>
           </Col>
         </Row>
         <TableComponent columns={columns} data={data} />

@@ -1,8 +1,27 @@
-import { Table } from "antd";
+import { Table, ConfigProvider } from "antd";
 import PropTypes from "prop-types";
 
 export function TableComponent({ columns = [], data = [] }) {
-  return <Table columns={columns} dataSource={data} />;
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Table: {
+            borderColor: "#f0f0f0",
+            headerBg: "#3687FF",
+            headerColor: "#fff",
+            bodySortBg: "#f2f7fc",
+            headerSortActiveBg: "#2a65bd",
+            headerSortHoverBg: "#2a65bd",
+            headerSplitColor: "#fff",
+            rowHoverBg: "#f2f7fc",
+          },
+        },
+      }}
+    >
+      <Table columns={columns} dataSource={data} />;
+    </ConfigProvider>
+  );
 }
 
 TableComponent.propTypes = {
