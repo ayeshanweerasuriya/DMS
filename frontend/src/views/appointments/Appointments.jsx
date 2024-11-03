@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Flex,
   Divider,
@@ -12,12 +13,19 @@ import {
   Button,
   Space,
 } from "antd";
-import { PhoneOutlined } from "@ant-design/icons";
+import { PhoneOutlined, CalendarOutlined } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { columns, data } from "../../testing/table-data";
 import { Message } from "../../components/message/Message";
+import { CalendarComponent as Calendar } from "../../components/calendar/CalendarComponent";
 
 export function AppointmentForm() {
+  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+
+  const handleCalendarButtonClick = () => {
+    setIsCalendarVisible(!isCalendarVisible);
+  };
+
   return (
     <Form
       name="layout-multiple-horizontal"
@@ -61,7 +69,7 @@ export function AppointmentForm() {
               size="large"
               min={1}
               max={100}
-              defaultValue={3}
+              initialvalues={3}
               style={{ width: "100%" }}
             />
           </Form.Item>
@@ -104,10 +112,21 @@ export function AppointmentForm() {
               >
                 Clear
               </Button>
+              <Button
+                size="large"
+                type="primary"
+                icon={<CalendarOutlined />}
+                onClick={handleCalendarButtonClick}
+              />
             </Space>
           </Form.Item>
         </Col>
       </Row>
+      {isCalendarVisible && (
+        <div style={{ marginTop: "20px" }}>
+          <Calendar />
+        </div>
+      )}
     </Form>
   );
 }
