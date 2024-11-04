@@ -1,5 +1,5 @@
-import { Routes, Route, Link } from "react-router-dom";
-import { Button, Layout, Menu, theme } from "antd";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Button, Layout, Menu, theme, ConfigProvider } from "antd";
 import { useState } from "react";
 import {
   UsergroupAddOutlined,
@@ -20,94 +20,105 @@ import { DeletePatients } from "./views/delete-patients/DeletePatients";
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
+  const location = useLocation();
 
   const borderRadiusLG = "25px";
   const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
 
   const menuItems = [
     {
-      key: "1",
+      key: "/appointments",
       icon: <UsergroupAddOutlined />,
       label: <Link to="/appointments">Appointments</Link>,
     },
     {
-      key: "2",
+      key: "/view-records",
       icon: <FolderViewOutlined />,
       label: <Link to="/view-records">View Records</Link>,
     },
     {
-      key: "3",
+      key: "/add-patients",
       icon: <UserAddOutlined />,
       label: <Link to="/add-patients">Add Patients</Link>,
     },
     {
-      key: "4",
+      key: "/update-patients",
       icon: <UpCircleOutlined />,
       label: <Link to="/update-patients">Update Patients</Link>,
     },
     {
-      key: "5",
+      key: "/delete-patients",
       icon: <DeleteOutlined />,
       label: <Link to="/delete-patients">Delete Patients</Link>,
     },
   ];
 
   return (
-    <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
-      <Sider
-        style={{ backgroundColor: "#fff" }}
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-      >
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="light"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          items={menuItems}
-        />
-        <div className="logout-btn">
-          <LogoutOutlined /> Logout
-        </div>
-      </Sider>
-      <Layout>
-        <Header
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-          }}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#3687FF",
+        },
+      }}
+    >
+      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
+        <Sider
+          style={{ backgroundColor: "#fff" }}
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 64,
-              height: 64,
-            }}
+          <div className="demo-logo-vertical" />
+          <Menu
+            theme="light"
+            mode="inline"
+            // defaultSelectedKeys={["1"]}
+            selectedKeys={[location.pathname]}
+            items={menuItems}
           />
-        </Header>
-        <Content
-          style={{
-            margin: "24px 16px",
-            padding: 24,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-          <Routes>
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/view-records" element={<ViewRecords />} />
-            <Route path="/add-patients" element={<AddPatients />} />
-            <Route path="/update-patients" element={<UpdatePatients />} />
-            <Route path="/delete-patients" element={<DeletePatients />} />
-          </Routes>
-        </Content>
+          <div className="logout-btn">
+            <LogoutOutlined /> Logout
+          </div>
+        </Sider>
+        <Layout>
+          <Header
+            style={{
+              padding: 0,
+              background: colorBgContainer,
+            }}
+          >
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: "16px",
+                width: 64,
+                height: 64,
+              }}
+            />
+          </Header>
+          <Content
+            style={{
+              margin: "24px 16px",
+              padding: 24,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+              overflow: "auto",
+            }}
+          >
+            <Routes>
+              <Route path="/appointments" element={<Appointments />} />
+              <Route path="/view-records" element={<ViewRecords />} />
+              <Route path="/add-patients" element={<AddPatients />} />
+              <Route path="/update-patients" element={<UpdatePatients />} />
+              <Route path="/delete-patients" element={<DeletePatients />} />
+            </Routes>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </ConfigProvider>
   );
 };
 
