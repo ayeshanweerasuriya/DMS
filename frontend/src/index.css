@@ -24,3 +24,32 @@ body {
   text-align: center;
   border-right: 1px solid #f0f0f0;
 }
+
+/* Customize the scrollbar */
+::-webkit-scrollbar {
+  display: block;
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3687ff; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2156a7; /* Color when hovering over the thumb */
+}
+
+::-webkit-scrollbar-track-piece:end {
+  background: transparent;
+  margin-bottom: 30px;
+}
+
+::-webkit-scrollbar-track-piece:start {
+  background: transparent;
+  margin-top: 30px;
+}
