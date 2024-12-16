@@ -32,26 +32,11 @@ export function AddPatients() {
           <Title level={2}>Add Patients</Title>
         </Divider>
       </Typography>
-      <AddPatients />
+      <AddPatientsForm handleRedirect={handleRedirect}/>
     </Flex>
   );
 }
 
-export function AddPatientstypo() {
-  
-
-  return (
-<Flex vertical>
-      <Typography>
-        <Divider orientation="left">
-          <Title level={2}>Add Patients</Title>
-        </Divider>
-      </Typography>
-      <AddPatients />
-    </Flex>
-
-  );
-}
 export function AddPatientsForm(props){
   return(
     <Form
