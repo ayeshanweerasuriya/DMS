@@ -1,19 +1,20 @@
-import { Divider, Typography, Space, Row, Col, Button, Input, Tooltip, Table } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Divider, Typography, Space, Row, Col, Input, Flex } from "antd";
+import { TableComponent } from "../../components/table/TableComponent";
+import { DeleteFilled } from "@ant-design/icons";
 
 const { Title } = Typography;
 const { Search } = Input;
 
 export function DeletePatients() {
 
-  const handleDelete = (record) => {
-    console.log("Delete patient with ID:", record.id);
+  const handleDelete = (key) => {
+    console.log("Delete patient with ID:", key);
   };
 
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
+      dataIndex: "key",
       key: "id",
     },
     {
@@ -35,38 +36,31 @@ export function DeletePatients() {
       title: "",
       key: "action",
       render: (_, record) => (
-        <Tooltip title="Delete Patient">
-          <Button
-            type="primary"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          >
-          </Button>
-        </Tooltip>
-      ),
+        <Flex align="center" justify="center">
+        <DeleteFilled style={{color: "red"}} onClick={() => handleDelete(record.key)}/>
+        </Flex>
+      )
     },
   ];
 
   const data = [
     {
       key: "1",
-      id: "1",
       name: "John Doe",
       contact: "0777788899",
       date: "2024/06/30",
     },
     {
-      id: 2,
-      name: "Jane Smith",
-      contact: "987-654-3210",
-      date: "2024-12-20",
+      key: "2",
+      name: "John Doe",
+      contact: "0777788899",
+      date: "2024/06/30",
     },
     // Add more rows as needed
   ];
 
   return (
-    <Space direction="vertical" style={{ padding: "10px", width: "100%" }} size="large">
+    <Flex vertical>
       <Typography>
         <Title level={2}>Delete Patients</Title>
         <Divider />
@@ -81,14 +75,12 @@ export function DeletePatients() {
             />
           </Col>
         </Row>
-        <Table
+        <TableComponent
           columns={columns}
-          dataSource={data}
-          bordered
-          pagination={{ pageSize: 7 }}
+          data={data}
         />
       </Space>
-    </Space>
+    </Flex>
   );
 }
 
