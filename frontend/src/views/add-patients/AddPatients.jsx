@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Flex,
   Divider,
@@ -12,30 +11,13 @@ import {
   Button,
   Space,
 } from "antd";
-import { PhoneOutlined, CalendarOutlined } from "@ant-design/icons";
+import { PhoneOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 import { useNavigate } from "react-router-dom";
-export function AddPatients() {
-  const { Title } = Typography;
-  const navigate = useNavigate();
-  const handleRedirect = () => {
-    navigate("/view-records");
-  }
-  
+
+export function AddPatientsForm(props) {
+
   return (
-   // <AddPatientsForm handleRedirect={handleRedirect}/> 
-   <Flex vertical>
-      <Typography>
-        <Divider orientation="left">
-          <Title level={2}>Add Patients</Title>
-        </Divider>
-      </Typography>
-      <AddPatientsForm handleRedirect={handleRedirect}/>
-    </Flex>
-  );
-}
-export function AddPatientsForm(props){
-  return(
     <Form
       name="layout-multiple-horizontal"
       layout="vertical"
@@ -49,10 +31,7 @@ export function AddPatientsForm(props){
             name="patientName"
             rules={[{ required: true }]}
           >
-            <Input
-              size="large"
-              style={{ width: "100%" }}
-            />
+            <Input size="large" style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item
             label="Patient Age"
@@ -69,7 +48,7 @@ export function AddPatientsForm(props){
           </Form.Item>
           <Form.Item
             label="Illness Type"
-            name="age"
+            name="illness"
             rules={[{ required: true }]}
           >
             <InputNumber
@@ -92,23 +71,27 @@ export function AddPatientsForm(props){
               style={{ width: "100%" }}
             />
           </Form.Item>
-          <Form.Item label="Date of Birth" name="date" rules={[{ required: true }]}>
+          <Form.Item
+            label="Date of Birth"
+            name="date"
+            rules={[{ required: true }]}
+          >
             <DatePicker size="large" style={{ width: "100%" }} />
           </Form.Item>
         </Col>
         <Col span={12}>
-        <Form.Item
-        label="Patient Notes"
-        name="PatientNote"
-        rules={[{ required: false }]}
-        >
-        <Input.TextArea
+          <Form.Item
+            label="Patient Notes"
+            name="PatientNote"
+            rules={[{ required: false }]}
+          >
+            <Input.TextArea
               rows={7} // Specify the number of rows you want
               size="large"
               placeholder="Add Patient's Notes Here.."
               style={{ width: "100%" }}
             />
-        </Form.Item> 
+          </Form.Item>
           <Form.Item label="ㅤ" rules={[{ required: true }]}>
             <Space size={"large"}>
               <Button
@@ -116,9 +99,7 @@ export function AddPatientsForm(props){
                 size="large"
                 type="primary"
                 htmlType="submit"
-                onClick={() =>
-                  Message("success", "Patient Saved successfully")
-                }
+                onClick={() => Message("success", "Patient Saved successfully")}
               >
                 Save
               </Button>
@@ -134,8 +115,8 @@ export function AddPatientsForm(props){
                 style={{ backgroundColor: "#1890ff", color: "#fff" }}
                 size="large"
                 type="primary"
-                onClick={props.handleRedirect}
-               >
+                onClick={() => props.handleRedirect()}
+              >
                 Patient Records
               </Button>
             </Space>
@@ -143,5 +124,26 @@ export function AddPatientsForm(props){
         </Col>
       </Row>
     </Form>
-  )
+  );
+}
+
+export function AddPatients() {
+  const { Title } = Typography;
+  const navigate = useNavigate();
+
+  const handleRedirect = () => {
+    navigate("/view-records");
+  };
+
+  return (
+    // <AddPatientsForm handleRedirect={handleRedirect}/>
+    <Flex vertical>
+      <Typography>
+        <Divider orientation="left">
+          <Title level={2}>Add Patients</Title>
+        </Divider>
+      </Typography>
+      <AddPatientsForm handleRedirect={handleRedirect} />
+    </Flex>
+  );
 }
