@@ -1,12 +1,20 @@
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
-const User = require('../models/auth/User');
+const User = require("../models/auth/User");
 
-const createUser = async (req, res) => {
-  const { displayname, username, password } = req.body;
+const signupUser = async (req, res) => {
+  const { displayname, username, password, role } = req.body;
 
-  if (!displayname || !username || !password) {
+  // Allowed roles
+  const allowedRoles = ["Staff", "Doctor", "Admin"];
+
+  if (!displayname || !username || !password || !role) {
     return res.status(400).json({ error: "All fields are required" });
+  }
+
+  // Validate role
+  if (!allowedRoles.includes(role)) {
+    return res.status(400).json({ error: "Invalid role. Allowed roles: Staff, Doctor, Admin" });
   }
 
   try {
@@ -16,45 +24,55 @@ const createUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ displayname, username, password: hashedPassword });
+    const newUser = new User({ displayname, username, password: hashedPassword, role });
     await newUser.save();
 
     res.status(201).json({
       message: "User created successfully",
       displayname,
       username,
+      role,
     });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
 };
 
-const getUser = async (req, res) => {
+const signinUser = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ mssg: "Username or password is not defined" });
+    return res.status(400).json({ error: "Username or password is not defined" });
   }
 
   try {
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ mssg: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ mssg: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    res.send({
-      mssg: "User logged in successfully!",
+    // Generate JWT Token
+    const token = jsonwebtoken.sign(
+      { userId: user._id, username: user.username, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
+
+    res.json({
+      message: "User logged in successfully!",
       username: user.username,
       displayname: user.displayname,
+      role: user.role,
+      token, // Send JWT token for authentication
     });
   } catch (error) {
-    res.status(500).json({ mssg: "Server error", error });
+    res.status(500).json({ error: "Server error", details: error.message });
   }
 };
 
-module.exports = { createUser, getUser };
+module.exports = { signupUser, signinUser };

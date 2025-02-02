@@ -1,18 +1,23 @@
 const mongoose = require('mongoose');
 
 const patientSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    dateOfBirth: { type: Date, required: true },
-    contactInfo: {
-        phone: { type: String, required: true },
-        email: { type: String, required: true },
-        address: { type: String }
+    name: { type: String, required: true, maxlength: 100 },
+    age: { type: Number, required: true, min: 0, max: 150 },
+    illnessType: { type: String, required: true, maxlength: 200 },
+    contactNumber: { type: String, required: true, match: /^[0-9]{1,15}$/ },
+    dateOfBirth: { 
+        type: Date, 
+        required: true,
+        validate: {
+            validator: function(value) {
+                return value < new Date();
+            },
+            message: "Date of birth cannot be today or a future date."
+        }
     },
-    medicalHistory: [{
-    condition: { type: String, required: true }, // e.g., "Diabetes"
-    details: { type: String }, // optional details about the condition
-    }],
+    treatmentFee: { type: Number, maxlength: 2500, min: 0 },
+    medicationFee: { type: Number, maxlength: 2500, min: 0 },
+    notes: { type: String, maxlength: 2500 },
     createdAt: { type: Date, default: Date.now }
 });
 
