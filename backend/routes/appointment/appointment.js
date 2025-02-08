@@ -4,5 +4,7 @@ const appointmentController = require("../../controllers/appointmentController.j
 const router = express.Router();
 
 router.get("/", appointmentController.getAppointments);
+router.post("/", appointmentController.createAppointment);
 
 module.exports = router;
+
