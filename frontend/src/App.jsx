@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { Button, Layout, Menu, theme, ConfigProvider } from "antd";
 import { useState } from "react";
 import {
@@ -11,6 +11,7 @@ import {
   UserAddOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import { LogIn } from "./views/auth/LogIn";
 import { Appointments } from "./views/appointments/Appointments";
 import { ViewRecords } from "./views/view-patients/ViewRecords";
 import { AddPatients } from "./views/add-patients/AddPatients";
@@ -21,6 +22,7 @@ const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
   const location = useLocation();
+  const isAuthenticated = localStorage.getItem("auth") === "true";
 
   const borderRadiusLG = "25px";
   const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
@@ -53,6 +55,16 @@ const App = () => {
     },
   ];
 
+  const logOut = () => {
+    localStorage.removeItem("auth");
+    window.location.href = "/login"; // Force logout
+  };
+
+  // Show only the login page if the user is not authenticated
+  if (!isAuthenticated) {
+    return <LogIn />;
+  }
+
   return (
     <ConfigProvider
       theme={{
@@ -76,7 +88,7 @@ const App = () => {
             selectedKeys={[location.pathname]}
             items={menuItems}
           />
-          <div className="logout-btn">
+          <div className="logout-btn" onClick={logOut}>
             <LogoutOutlined /> Logout
           </div>
         </Sider>
@@ -109,11 +121,13 @@ const App = () => {
             }}
           >
             <Routes>
+            <Route path="/" element={<Navigate to="/appointments" replace />} />
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/view-records" element={<ViewRecords />} />
               <Route path="/add-patients" element={<AddPatients />} />
               <Route path="/update-patients" element={<UpdatePatients />} />
               <Route path="/delete-patients" element={<DeletePatients />} />
+              <Route path="*" element={<Navigate to="/appointments" replace />} />
             </Routes>
           </Content>
         </Layout>
