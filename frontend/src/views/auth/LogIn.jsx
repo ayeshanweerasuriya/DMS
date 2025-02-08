@@ -5,6 +5,7 @@ import { Button, Checkbox, Form, Input, Flex } from 'antd';
 import { useNavigate } from "react-router-dom";
 // import Button from "../../components/button/Button";
 import VerticalSpace from "../../components/vertical-space";
+import { login } from "../../apiService";
 
 
 export function LogIn() {
@@ -13,14 +14,25 @@ export function LogIn() {
 
   console.log("buttonState: ", buttonState);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log('Received values of form: ', values);
-    if (values.username === "admin" && values.password === "password") {
-      localStorage.setItem("auth", "true");
-      navigate("/appointments", { replace: true });
-    } else {
-      alert("Please enter valid credentials");
+    try {
+      const data = await login(values.username, values.password);  // Call the login API
+      if (data.statusCode === 200) {
+        console.log("data: ", data);
+        localStorage.setItem("auth", "true");
+        navigate("/appointments", { replace: true });
+      }
+      // Redirect or handle the successful login
+    } catch (error) {
+      alert(error.message || 'Login failed');
     }
+    // if (values.username === "admin" && values.password === "password") {
+    //   localStorage.setItem("auth", "true");
+    //   navigate("/appointments", { replace: true });
+    // } else {
+    //   alert("Please enter valid credentials");
+    // }
   };
 
   return (

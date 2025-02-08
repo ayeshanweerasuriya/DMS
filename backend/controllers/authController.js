@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 const User = require("../models/auth/User");
+require('dotenv').config();
 
 const signupUser = async (req, res) => {
   const { displayname, username, password, role } = req.body;
@@ -40,6 +41,8 @@ const signupUser = async (req, res) => {
 
 const signinUser = async (req, res) => {
   const { username, password } = req.body;
+  // console.log("username: ", username);
+  // console.log("password: ", password);
 
   if (!username || !password) {
     return res.status(400).json({ error: "Username or password is not defined" });
@@ -69,6 +72,7 @@ const signinUser = async (req, res) => {
       displayname: user.displayname,
       role: user.role,
       token, // Send JWT token for authentication
+      statusCode: 200,
     });
   } catch (error) {
     res.status(500).json({ error: "Server error", details: error.message });
