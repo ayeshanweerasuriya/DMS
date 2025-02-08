@@ -25,9 +25,18 @@ export const login = async (username, password) => {
 };
 
 // Other API calls to access data
-export const getAppointment = async () => {
+export const getAppointments = async () => {
   try {
     const response = await api.get('/api/appointment');  // Adjust the endpoint accordingly
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : 'An error occurred';
+  }
+};
+
+export const createAppointment = async () => {
+  try {
+    const response = await api.post('/api/appointment');  // Adjust the endpoint accordingly
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : 'An error occurred';
