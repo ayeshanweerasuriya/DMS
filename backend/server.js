@@ -9,7 +9,11 @@ const connectToDatabase = require("./db");
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // replace with your frontend URL if different
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(express.json());
 
 app.use((req, res, next) => {
