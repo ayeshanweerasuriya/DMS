@@ -17,12 +17,13 @@ import { ViewRecords } from "./views/view-patients/ViewRecords";
 import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
+import { Message } from "./components/message/Message";
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
   const location = useLocation();
-  const isAuthenticated = localStorage.getItem("auth") === "true";
+  const isAuthenticated = sessionStorage.getItem("token") !== null;
 
   const borderRadiusLG = "25px";
   const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
@@ -56,7 +57,6 @@ const App = () => {
   ];
 
   const logOut = () => {
-    localStorage.removeItem("auth");
     sessionStorage.removeItem("token");
     window.location.href = "/login"; // Force logout
   };

@@ -24,6 +24,20 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+const logOut = () => {
+  window.location.href = "/login"; // Force logout
+};
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+      logOut(); // Redirect to login
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Auth API calls
 export const login = async (username, password) => {
   try {
@@ -39,6 +53,16 @@ export const login = async (username, password) => {
 export const getPatientList = async () => {
   try {
     const response = await api.get('/api/patient');
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : 'An error occurred';
+  }
+};
+
+export const createPatient = async (data) => {
+  console.log(data);
+  try {
+    const response = await api.post('/api/patient', data);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : 'An error occurred';
