@@ -5,7 +5,7 @@ const authenticate = require("../../middleware/authenticate.js");
 const router = express.Router();
 
 router.get("/", authenticate, appointmentController.getAppointments);
-router.post("/", appointmentController.createAppointment);
+router.post("/", authenticate, appointmentController.createAppointment);
 
 module.exports = router;
 
