@@ -101,8 +101,19 @@ const deletePatient = async (req, res) => {
     }
 };
 
+const getPatients = async (req, res) => {
+    try {
+        const patients = await Patient.find();
+        res.status(200).json({ message: "Patients retrieved successfully", patients });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 module.exports = {
     addPatient,
     updatePatient,
-    deletePatient
+    deletePatient,
+    getPatients
   };

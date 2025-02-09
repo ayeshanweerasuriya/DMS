@@ -33,6 +33,7 @@ const signupUser = async (req, res) => {
       displayname,
       username,
       role,
+      status: 201
     });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
@@ -66,13 +67,13 @@ const signinUser = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.json({
+    res.status(200).json({
       message: "User logged in successfully!",
       username: user.username,
       displayname: user.displayname,
       role: user.role,
       token, // Send JWT token for authentication
-      statusCode: 200,
+      status: 200
     });
   } catch (error) {
     res.status(500).json({ error: "Server error", details: error.message });

@@ -57,6 +57,7 @@ const App = () => {
 
   const logOut = () => {
     localStorage.removeItem("auth");
+    sessionStorage.removeItem("token");
     window.location.href = "/login"; // Force logout
   };
 
