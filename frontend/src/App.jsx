@@ -16,8 +16,9 @@ import { ViewRecords } from "./views/view-patients/ViewRecords";
 import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
+import { ViewIncome } from "./views/view-income/ViewIncome";
 
-const App = () => {
+function App() {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
   const location = useLocation();
@@ -51,6 +52,11 @@ const App = () => {
       icon: <DeleteOutlined />,
       label: <Link to="/delete-patients">Delete Patients</Link>,
     },
+    {
+      key: "/view-income",
+      icon: <DeleteOutlined />,
+      label: <Link to="/view-income">View Income</Link>,
+    },
   ];
 
   return (
@@ -74,8 +80,7 @@ const App = () => {
             mode="inline"
             // defaultSelectedKeys={["1"]}
             selectedKeys={[location.pathname]}
-            items={menuItems}
-          />
+            items={menuItems} />
           <div className="logout-btn">
             <LogoutOutlined /> Logout
           </div>
@@ -95,8 +100,7 @@ const App = () => {
                 fontSize: "16px",
                 width: 64,
                 height: 64,
-              }}
-            />
+              }} />
           </Header>
           <Content
             style={{
@@ -114,12 +118,13 @@ const App = () => {
               <Route path="/add-patients" element={<AddPatients />} />
               <Route path="/update-patients" element={<UpdatePatients />} />
               <Route path="/delete-patients" element={<DeletePatients />} />
+              <Route path="/view-income" element={<ViewIncome />} />
             </Routes>
           </Content>
         </Layout>
       </Layout>
     </ConfigProvider>
   );
-};
+}
 
 export default App;
