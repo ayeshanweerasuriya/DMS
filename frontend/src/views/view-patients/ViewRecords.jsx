@@ -107,7 +107,7 @@ export function ViewRecords() {
             </Tooltip>
           </Col>
         </Row>
-        <TableComponent columns={columns} data={data || []} />
+        <TableComponent columns={columns} data={data || []}/>
       </Space>
     </Flex>
   );
