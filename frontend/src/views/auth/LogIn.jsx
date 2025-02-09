@@ -1,31 +1,45 @@
 import "./LogIn.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LockOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Flex } from 'antd';
 import { useNavigate } from "react-router-dom";
 // import Button from "../../components/button/Button";
 import VerticalSpace from "../../components/vertical-space";
 import { login } from "../../apiService";
+import { Message } from "../../components/message/Message";
 
 
 export function LogIn() {
   const [buttonState, setButtonState] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   console.log("buttonState: ", buttonState);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setError('');
+    }, 3000);
+  }, [error]);
 
   const onFinish = async (values) => {
     console.log('Received values of form: ', values);
     try {
       const data = await login(values.username, values.password);  // Call the login API
-      if (data.statusCode === 200) {
-        console.log("data: ", data);
+      if (data.status === 200) {
+        // console.log("data: ", data);
         localStorage.setItem("auth", "true");
-        navigate("/appointments", { replace: true });
+        Message("success", "Login successful", 2);
+        setTimeout(() => {
+          navigate("/appointments", { replace: true });
+        }, 2000);
+      } else {
+        Message("error", "Invalid username or password", 5);
       }
       // Redirect or handle the successful login
     } catch (error) {
-      alert(error.message || 'Login failed');
+      console.error("error: ", error);
+      Message("error", "Invalid username or password", 5);
     }
     // if (values.username === "admin" && values.password === "password") {
     //   localStorage.setItem("auth", "true");
@@ -50,7 +64,8 @@ export function LogIn() {
             onClick={() => setButtonState(false)}
             style={{
               marginRight: "2.5px",
-              backgroundColor: buttonState ? "#aaccff" : "#8eaad4",
+              backgroundColor: buttonState ? "#8eaad4" : "#4187f0",
+              color: buttonState ? "#000" : "#fff"
             }}
           >
             <img src="/login/staff.svg" alt="staff" />
@@ -64,7 +79,8 @@ export function LogIn() {
             onClick={() => setButtonState(true)}
             style={{
               marginLeft: "2.5px",
-              backgroundColor: buttonState ? "#8eaad4" : "#aaccff",
+              backgroundColor: buttonState ? "#4187f0" : "#8eaad4",
+              color: buttonState ? "#fff" : "#000"
             }}
           >
             <img src="/login/doctor.svg" alt="doctor" />

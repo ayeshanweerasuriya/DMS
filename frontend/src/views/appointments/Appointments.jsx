@@ -15,7 +15,6 @@ import {
 } from "antd";
 import { PhoneOutlined, CalendarOutlined } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
-import { columns, data } from "../../testing/table-data";
 import { Message } from "../../components/message/Message";
 import { CalendarComponent as Calendar } from "../../components/calendar/CalendarComponent";
 
@@ -148,7 +147,7 @@ export function Appointments() {
           <Title level={2}>Appointments</Title>
         </Divider>
       </Typography>
-      <TableComponent columns={columns} data={data} />
+      <TableComponent columns={[]} data={[]} />
     </Flex>
   );
 }
