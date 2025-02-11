@@ -62,9 +62,9 @@ const App = () => {
   };
 
   // Show only the login page if the user is not authenticated
-  if (!isAuthenticated) {
-    return <LogIn />;
-  }
+  // if (!isAuthenticated) {
+  //   return <LogIn />;
+  // }
 
   return (
     <ConfigProvider
@@ -74,7 +74,9 @@ const App = () => {
         },
       }}
     >
-      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
+    {!isAuthenticated ? (
+      <LogIn />
+    ) : (      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
         <Sider
           style={{ backgroundColor: "#fff" }}
           trigger={null}
@@ -132,7 +134,7 @@ const App = () => {
             </Routes>
           </Content>
         </Layout>
-      </Layout>
+      </Layout>)}
     </ConfigProvider>
   );
 };

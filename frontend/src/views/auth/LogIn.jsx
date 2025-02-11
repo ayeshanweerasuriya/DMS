@@ -14,18 +14,12 @@ import { Message } from "../../components/message/Message";
 
 export function LogIn() {
   const [buttonState, setButtonState] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setTimeout(() => {
-      setError("");
-    }, 3000);
-  }, [error]);
 
   const onFinish = async (values) => {
     try {
       const data = await login(values.username, values.password);
+      console.log("data: ", data);
       if (data.status === 200 && data.token) {
         Message("success", "Login successful", 2);
         setTimeout(() => {
@@ -36,7 +30,7 @@ export function LogIn() {
       }
     } catch (error) {
       console.error("error: ", error);
-      Message("error", "Invalid username or password", 5);
+      // Message("error", "Invalid username or password", 5);
     }
   };
 
