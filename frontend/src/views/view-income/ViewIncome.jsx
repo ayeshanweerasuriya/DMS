@@ -37,11 +37,11 @@ export function ViewIncome() {
         <Divider />
       </Typography>
       <Row gutter={24}>
-        <Col span={18}>
+        <Col span={16}>
           <TableComponent columns={columns} data={incomeData} />
         </Col>
-        <Col span={6}>
-          <Space direction="vertical" size="large" style={{ width: "100%",textAlign: "center" }}>
+        <Col span={8}>
+          <Space direction="vertical" size="large" style={{ width: "100%" }}>
             <Card title="Daily Income" bordered={false}>
               <InputNumber value={dailyIncome} disabled style={{ width: "100%", textAlign: "center" }} />
             </Card>
@@ -51,14 +51,14 @@ export function ViewIncome() {
           </Space>
         </Col>
       </Row>
-      <Row gutter={10} style={{ marginTop: 10 }}>
-        <Col span={18}>
+      <Row gutter={24} style={{ marginTop: 20 }}>
+        <Col span={24}>
           <Card title="Hospital Charge" bordered={false}>
             <InputNumber
               min={0}
               value={hospitalCharge}
               onChange={setHospitalCharge}
-              style={{ width: "50%", textAlign: "center" }}
+              style={{ width: "100%", textAlign: "center" }}
             />
           </Card>
         </Col>
