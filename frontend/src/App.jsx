@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { Button, Layout, Menu, theme, ConfigProvider } from "antd";
 import { useState } from "react";
 import {
@@ -12,17 +12,19 @@ import {
   LogoutOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
+import { LogIn } from "./views/auth/LogIn";
 import { Appointments } from "./views/appointments/Appointments";
 import { ViewRecords } from "./views/view-patients/ViewRecords";
 import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
-import { ViewIncome } from "./views/view-income/ViewIncome";
+import { Message } from "./components/message/Message";
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
   const location = useLocation();
+  const isAuthenticated = sessionStorage.getItem("token") !== null;
 
   const borderRadiusLG = "25px";
   const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
@@ -60,6 +62,16 @@ function App() {
     },
   ];
 
+  const logOut = () => {
+    sessionStorage.removeItem("token");
+    window.location.href = "/login"; // Force logout
+  };
+
+  // Show only the login page if the user is not authenticated
+  // if (!isAuthenticated) {
+  //   return <LogIn />;
+  // }
+
   return (
     <ConfigProvider
       theme={{
@@ -68,7 +80,9 @@ function App() {
         },
       }}
     >
-      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
+    {!isAuthenticated ? (
+      <LogIn />
+    ) : (      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
         <Sider
           style={{ backgroundColor: "#fff" }}
           trigger={null}
@@ -81,8 +95,9 @@ function App() {
             mode="inline"
             // defaultSelectedKeys={["1"]}
             selectedKeys={[location.pathname]}
-            items={menuItems} />
-          <div className="logout-btn">
+            items={menuItems}
+          />
+          <div className="logout-btn" onClick={logOut}>
             <LogoutOutlined /> Logout
           </div>
         </Sider>
@@ -114,16 +129,17 @@ function App() {
             }}
           >
             <Routes>
+            <Route path="/" element={<Navigate to="/appointments" replace />} />
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/view-records" element={<ViewRecords />} />
               <Route path="/add-patients" element={<AddPatients />} />
               <Route path="/update-patients" element={<UpdatePatients />} />
               <Route path="/delete-patients" element={<DeletePatients />} />
-              <Route path="/view-income" element={<ViewIncome />} />
+              <Route path="*" element={<Navigate to="/appointments" replace />} />
             </Routes>
           </Content>
         </Layout>
-      </Layout>
+      </Layout>)}
     </ConfigProvider>
   );
 }
