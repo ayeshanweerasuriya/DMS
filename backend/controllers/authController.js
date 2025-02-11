@@ -10,18 +10,18 @@ const signupUser = async (req, res) => {
   const allowedRoles = ["Staff", "Doctor", "Admin"];
 
   if (!displayname || !username || !password || !role) {
-    return res.status(400).json({ error: "All fields are required" });
+    return res.status(400).json({ error: "All fields are required", status: 400 });
   }
 
   // Validate role
   if (!allowedRoles.includes(role)) {
-    return res.status(400).json({ error: "Invalid role. Allowed roles: Staff, Doctor, Admin" });
+    return res.status(400).json({ error: "Invalid role. Allowed roles: Staff, Doctor, Admin", status: 400 });
   }
 
   try {
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(409).json({ error: "Username already exists" });
+      return res.status(409).json({ error: "Username already exists", status: 409 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,7 +36,7 @@ const signupUser = async (req, res) => {
       status: 201
     });
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", status: 500 });
   }
 };
 
@@ -52,12 +52,12 @@ const signinUser = async (req, res) => {
   try {
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid username or password", status: 401 });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid username or password", status: 401 });
     }
 
     // Generate JWT Token
@@ -76,7 +76,7 @@ const signinUser = async (req, res) => {
       status: 200
     });
   } catch (error) {
-    res.status(500).json({ error: "Server error", details: error.message });
+    res.status(500).json({ error: "Server error", status: 500 });
   }
 };
 

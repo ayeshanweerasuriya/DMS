@@ -69,6 +69,16 @@ export const createPatient = async (data) => {
   }
 };
 
+export const updatePatient = async (id, data) => {
+  console.log(data);
+  try {
+    const response = await api.patch(`/api/patient/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : 'An error occurred';
+  }
+};
+
 export const getAppointments = async () => {
   try {
     const response = await api.get('/api/appointment');
