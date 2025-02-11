@@ -10,6 +10,7 @@ import {
   DeleteOutlined,
   UserAddOutlined,
   LogoutOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { Appointments } from "./views/appointments/Appointments";
 import { ViewRecords } from "./views/view-patients/ViewRecords";
@@ -54,7 +55,7 @@ function App() {
     },
     {
       key: "/view-income",
-      icon: <DeleteOutlined />,
+      icon: <DollarOutlined />,
       label: <Link to="/view-income">View Income</Link>,
     },
   ];
