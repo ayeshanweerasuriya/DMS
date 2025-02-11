@@ -75,7 +75,7 @@ export function ViewRecords() {
   return (
     <Flex vertical>
       <Typography>
-        <Title level={2}>View Records</Title>
+        <Title level={2}>Patient Records</Title>
         <Divider />
       </Typography>
       <Space direction="vertical" size="large">
@@ -89,7 +89,7 @@ export function ViewRecords() {
           </Col>
           <Col gutter={6}>
             <DropdownMenu
-              label="Sort By"
+              label="Filter By"
               items={[
                 { key: "1", label: "Name" },
                 { key: "2", label: "Age" },

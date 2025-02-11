@@ -10,6 +10,7 @@ import {
   DeleteOutlined,
   UserAddOutlined,
   LogoutOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { LogIn } from "./views/auth/LogIn";
 import { Appointments } from "./views/appointments/Appointments";
@@ -19,7 +20,7 @@ import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
 import { Message } from "./components/message/Message";
 
-const App = () => {
+function App() {
   const [collapsed, setCollapsed] = useState(false);
   const { Header, Sider, Content } = Layout;
   const location = useLocation();
@@ -53,6 +54,11 @@ const App = () => {
       key: "/delete-patients",
       icon: <DeleteOutlined />,
       label: <Link to="/delete-patients">Delete Patients</Link>,
+    },
+    {
+      key: "/view-income",
+      icon: <DollarOutlined />,
+      label: <Link to="/view-income">View Income</Link>,
     },
   ];
 
@@ -110,8 +116,7 @@ const App = () => {
                 fontSize: "16px",
                 width: 64,
                 height: 64,
-              }}
-            />
+              }} />
           </Header>
           <Content
             style={{
@@ -137,6 +142,6 @@ const App = () => {
       </Layout>)}
     </ConfigProvider>
   );
-};
+}
 
 export default App;
