@@ -18,7 +18,8 @@ import { ViewRecords } from "./views/view-patients/ViewRecords";
 import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
-import { Message } from "./components/message/Message";
+import { ViewIncome } from "./views/view-income/ViewIncome";
+
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
@@ -135,6 +136,7 @@ function App() {
               <Route path="/add-patients" element={<AddPatients />} />
               <Route path="/update-patients" element={<UpdatePatients />} />
               <Route path="/delete-patients" element={<DeletePatients />} />
+              <Route path="/view-income" element={<ViewIncome />} />
               <Route path="*" element={<Navigate to="/appointments" replace />} />
             </Routes>
           </Content>
