@@ -88,11 +88,22 @@ export const getAppointments = async () => {
   }
 };
 
-export const createAppointment = async () => {
+export const createAppointment = async (data) => {
   try {
-    const response = await api.post('/api/appointment');
+    const response = await api.post('/api/appointment', data);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : 'An error occurred';
   }
 };
+
+
+export async function getAppointmentsList() {
+  try {
+    const response = await api.get('/api/appointment'); // Axios handles errors better
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    return { appointments: [] };
+  }
+}
