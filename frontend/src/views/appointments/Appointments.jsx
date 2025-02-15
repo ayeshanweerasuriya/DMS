@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import {
   Flex,
   Divider,
@@ -15,14 +15,19 @@ import {
   message,
 } from "antd";
 
-import { PhoneOutlined, CalendarOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  PhoneOutlined,
+  CalendarOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { CalendarComponent as Calendar } from "../../components/calendar/CalendarComponent";
 import moment from "moment";
 import { createAppointment, getAppointmentsList } from "../../apiService";
 import { Message } from "../../components/message/Message";
 
-export function AppointmentForm() { // Receive function as prop
+export function AppointmentForm({ setfetchdata }) {
+  // Receive function as prop
   const [form] = Form.useForm(); // Create form instance
 
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
@@ -45,8 +50,7 @@ export function AppointmentForm() { // Receive function as prop
       const currentMinute = moment().minute();
 
       return {
-        disabledHours: () =>
-          Array.from({ length: currentHour }, (_, i) => i), // Disable past hours
+        disabledHours: () => Array.from({ length: currentHour }, (_, i) => i), // Disable past hours
         disabledMinutes: (selectedHour) =>
           selectedHour === currentHour
             ? Array.from({ length: currentMinute }, (_, i) => i) // Disable past minutes if same hour
@@ -61,34 +65,36 @@ export function AppointmentForm() { // Receive function as prop
     // console.log("Original values: ", values);
 
     // Format date to "YYYY-MM-DD"
-    const formattedDate = new Date(values.appointmentDate).toISOString().split("T")[0];
+    const formattedDate = new Date(values.appointmentDate)
+      .toISOString()
+      .split("T")[0];
 
     // Format time to "HH:MM AM/PM"
     const timeObj = new Date(values.appointmentTime);
     const formattedTime = timeObj.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     });
 
     // Update values before passing to createAppointment
     const formattedValues = {
-        ...values,
-        appointmentDate: formattedDate,
-        appointmentTime: formattedTime
+      ...values,
+      appointmentDate: formattedDate,
+      appointmentTime: formattedTime,
     };
 
     try {
-        const response = await createAppointment(formattedValues);
-        if (response.status === 200) {
-          Message("success", response.message, 2);
-          form.resetFields();
-        }
+      const response = await createAppointment(formattedValues);
+      if (response.status === 200) {
+        Message("success", response.message, 2);
+        setfetchdata(true);
+        form.resetFields();
+      }
     } catch (error) {
-        console.error("Failed to create appointment:", error);
+      console.error("Failed to create appointment:", error);
     }
-};
-
+  };
 
   return (
     <Form
@@ -114,35 +120,59 @@ export function AppointmentForm() { // Receive function as prop
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item label="Date" name="appointmentDate" rules={[{ required: true, message: "Date is required" }]}>
-          <DatePicker size="large" style={{ width: "100%" }}
-           disabledDate={disabledDate}
-           onChange={(date) => setSelectedDate(date)}
-           />
+          <Form.Item
+            label="Date"
+            name="appointmentDate"
+            rules={[{ required: true, message: "Date is required" }]}
+          >
+            <DatePicker
+              size="large"
+              style={{ width: "100%" }}
+              disabledDate={disabledDate}
+              onChange={(date) => setSelectedDate(date)}
+            />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item label="Time" name="appointmentTime" rules={[{ required: true, message: "Time is required" }]}>
-            <TimePicker size="large" style={{ width: "100%" }} 
-            format="HH:mm"
-            use12Hours={false}
-            disabledTime={disabledTime} // Use the new function here
-             />
+          <Form.Item
+            label="Time"
+            name="appointmentTime"
+            rules={[
+              { required: true, message: "Time is required" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!getFieldValue("appointmentDate")) {
+                    return Promise.reject(
+                      new Error("Please select a date first!")
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <TimePicker
+              size="large"
+              style={{ width: "100%" }}
+              format="HH:mm"
+              use12Hours={false}
+              disabledTime={disabledTime} // Use the new function here
+            />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
             label="Patient Age"
             name="patientAge"
-            rules={[{  required: true, message: "Age is required" }]}
+            rules={[{ required: true, message: "Age is required" }]}
           >
             <InputNumber
               size="large"
               min={1}
               max={100}
-              parser={(value) => value.replace(/\D/g, "")}  // Strips non-numeric input
+              parser={(value) => value.replace(/\D/g, "")} // Strips non-numeric input
               onKeyPress={(e) => {
                 if (!/^\d+$/.test(e.key)) {
                   e.preventDefault(); // Prevents non-numeric key press
@@ -160,7 +190,10 @@ export function AppointmentForm() { // Receive function as prop
             name="contactNumber"
             rules={[
               { required: true, message: "Contact number is required" },
-              { pattern: /^[0-9]{10}$/, message: "Contact number must be exactly 10 digits" },
+              {
+                pattern: /^[0-9]{10}$/,
+                message: "Contact number must be exactly 10 digits",
+              },
             ]}
           >
             <Input
@@ -184,7 +217,6 @@ export function AppointmentForm() { // Receive function as prop
                 Add Appointment
               </Button>
 
-
               <Button
                 style={{ backgroundColor: "#000", color: "#fff" }}
                 size="large"
@@ -193,7 +225,7 @@ export function AppointmentForm() { // Receive function as prop
               >
                 Clear
               </Button>
-                
+
               <Button
                 size="large"
                 type="primary"
@@ -214,24 +246,46 @@ export function AppointmentForm() { // Receive function as prop
 }
 
 export function Appointments() {
-  
   const { Title } = Typography;
   const [appointments, setAppointments] = useState([]);
 
+  // useEffect(() => {
+  //   getAppointmentsList()
+  //     .then((response) => {
+  //       if (response && response.appointments) {
+  //         setAppointments(response.appointments);
+  //       } else {
+  //         console.error("Invalid response structure:", response);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching appointments:", error);
+  //       message.error("Failed to fetch appointments.");
+  //     });
+  // }, []);
+
+  const [data, setData] = useState([]);
+  const [fetchdata, setfetchdata] = useState(false);
+  console.log("data: ", data);
+
   useEffect(() => {
+    getData();
+  }, []);
+  useEffect(() => {
+    getData();
+    setfetchdata(false);
+  }, [fetchdata]);
+
+  const getData = async () => {
     getAppointmentsList()
       .then((response) => {
-        if (response && response.appointments) {
-          setAppointments(response.appointments);
-        } else {
-          console.error("Invalid response structure:", response);
-        }
+        console.log("response: ", response);
+        setData(response.appointments);
       })
       .catch((error) => {
-        console.error("Error fetching appointments:", error);
-        message.error("Failed to fetch appointments.");
+        console.error("error: ", error);
       });
-  }, []);
+  };
 
   const columns = [
     {
@@ -283,14 +337,14 @@ export function Appointments() {
           <Title level={2}>Add Appointments</Title>
         </Divider>
       </Typography>
-   <AppointmentForm/>
+      <AppointmentForm setfetchdata={setfetchdata} />
       <Divider style={{ borderColor: "#000" }} />
       <Typography>
         <Divider orientation="left">
           <Title level={2}>Appointments</Title>
         </Divider>
       </Typography>
-      <TableComponent columns={columns} data={appointments} />
+      <TableComponent columns={columns} data={data} />
     </Flex>
   );
-};
+}
