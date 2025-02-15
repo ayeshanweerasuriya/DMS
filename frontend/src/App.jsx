@@ -19,7 +19,7 @@ import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
 import { ViewIncome } from "./views/view-income/ViewIncome";
-
+import { Message } from "./components/message/Message";
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
