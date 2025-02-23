@@ -102,13 +102,27 @@ const deletePatient = async (req, res) => {
 };
 
 const getPatients = async (req, res) => {
-    try {
-        const patients = await Patient.find();
-        res.status(200).json({ message: "Patients retrieved successfully", patients, status: 200 });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error", status: 500 });
+  try {
+    const searchQuery = req.query.search; // Get search query from request
+
+    let filter = {};
+    if (searchQuery) {
+      filter = {
+        $or: [
+          { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive name search
+          { contactNumber: { $regex: searchQuery, $options: "i" } }, // Case-insensitive contact number search
+        ],
+      };
     }
+
+    const patients = await Patient.find(filter);
+    return res
+      .status(200)
+      .json({ message: "Patients retrieved successfully", patients });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 module.exports = {

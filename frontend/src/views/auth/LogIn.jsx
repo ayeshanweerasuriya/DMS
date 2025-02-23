@@ -1,5 +1,5 @@
 import "./LogIn.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   LockOutlined,
   UserOutlined,
