@@ -15,10 +15,10 @@ import {
 } from "antd";
 import { PhoneOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
-import { useNavigate } from "react-router-dom";
-import { getPatientList } from "../../apiService";
+// import { useNavigate } from "react-router-dom";
+import {getPatientList} from "../../apiService";
 import { TableComponent } from "../../components/table/TableComponent";
-import { PlusOutlined, EditOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import moment from "moment";
 import { updatePatient } from "../../apiService";
@@ -244,6 +244,10 @@ export function UpdatePatientsForm({ data }) {
           </Form.Item>
 
           <Form.Item label="Medication Fee" name="medicationFee">
+            <Input size="large" />
+          </Form.Item>
+
+          <Form.Item label="Hospital Fee" name="medicationFee">
             <Input size="large" />
           </Form.Item>
         </Col>

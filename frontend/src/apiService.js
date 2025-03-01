@@ -53,9 +53,10 @@ export const login = async (username, password) => {
 };
 
 // Other API calls to access data
-export const getPatientList = async () => {
+export const getPatientList = async (searchQuery = "") => {
+  console.log("searchQuery: ", searchQuery);
   try {
-    const response = await api.get("/api/patient");
+    const response = await api.get(`/api/patient?search=${searchQuery}`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : "An error occurred";
@@ -81,6 +82,15 @@ export const updatePatient = async (id, data) => {
     throw error.response ? error.response.data : "An error occurred";
   }
 };
+
+export const deletePatient = async (id) => {
+  try {
+    const response = await api.delete(`/api/patient/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : 'An error occurred';
+  }
+}
 
 export const getAppointments = async () => {
   try {
