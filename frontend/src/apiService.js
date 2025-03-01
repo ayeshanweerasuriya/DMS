@@ -44,8 +44,11 @@ api.interceptors.response.use(
 // Auth API calls
 export const login = async (username, password) => {
   try {
-    const response = await api.post("/auth/login", { username, password });
-    sessionStorage.setItem("token", response.data.token);
+    const response = await api.post('/auth/login', { username, password });
+    sessionStorage.setItem('token', response.data.token);
+    sessionStorage.setItem('username', response.data.username);
+    sessionStorage.setItem('displayname', response.data.displayname);
+    sessionStorage.setItem('role', response.data.role);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : "An error occurred";
@@ -53,7 +56,7 @@ export const login = async (username, password) => {
 };
 
 // Other API calls to access data
-export const getPatientList = async (searchQuery = "") => {
+export const getPatientList = async (searchQuery = "", filter = null) => {
   console.log("searchQuery: ", searchQuery);
   try {
     const response = await api.get(`/api/patient?search=${searchQuery}`);

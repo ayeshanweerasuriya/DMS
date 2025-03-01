@@ -1,6 +1,6 @@
 import { Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
-import { Button, Layout, Menu, theme, ConfigProvider } from "antd";
-import { useState } from "react";
+import { Button, Layout, Menu, theme, ConfigProvider, Typography, Space } from "antd";
+import { useState, useEffect } from "react";
 import {
   UsergroupAddOutlined,
   FolderViewOutlined,
@@ -11,6 +11,7 @@ import {
   UserAddOutlined,
   LogoutOutlined,
   DollarOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import { LogIn } from "./views/auth/LogIn";
 import { Appointments } from "./views/appointments/Appointments";
@@ -21,14 +22,84 @@ import { DeletePatients } from "./views/delete-patients/DeletePatients";
 import { ViewIncome } from "./views/view-income/ViewIncome";
 import { Message } from "./components/message/Message";
 
-function App() {
-  const [collapsed, setCollapsed] = useState(false);
-  const { Header, Sider, Content } = Layout;
-  const location = useLocation();
-  const isAuthenticated = sessionStorage.getItem("token") !== null;
+const { Header, Sider } = Layout;
+const { Text } = Typography;
 
-  const borderRadiusLG = "25px";
-  const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
+
+export function CustomHeader({ collapsed, setCollapsed }) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Update time every second
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    // Retrieve user details from storage
+    const storedUser = {
+      username: sessionStorage.getItem("username"),
+      displayname: sessionStorage.getItem("displayname"),
+      role: sessionStorage.getItem("role"),
+    };
+    
+    if (storedUser.username) {
+      setUser(storedUser);
+    }
+
+    return () => clearInterval(timer); // Cleanup on unmount
+  }, []);
+
+  // Determine greeting based on the time of login
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
+  return (
+    <Header
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "0 20px",
+        background: "#fff", // Use colorBgContainer if defined
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      {/* Sidebar Toggle Button */}
+      <Button
+        type="text"
+        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        onClick={() => setCollapsed(!collapsed)}
+        style={{
+          fontSize: "16px",
+          width: 64,
+          height: 64,
+        }}
+      />
+
+      {/* Real-time Date & Time */}
+      <Text strong>
+        {currentTime.toLocaleDateString()} - {currentTime.toLocaleTimeString()}
+      </Text>
+
+      {/* User Info Section */}
+      {user && (
+        <Space>
+          <Text strong>{getGreeting()}, {user.displayname}!</Text>
+          <Text type="secondary">({user.role})</Text>
+          <UserOutlined style={{ fontSize: 20 }} />
+        </Space>
+      )}
+    </Header>
+  );
+}
+
+export function Sidebar({ collapsed, logOut }) {
+  const location = useLocation();
 
   const menuItems = [
     {
@@ -63,6 +134,86 @@ function App() {
     },
   ];
 
+  return (
+    <Sider
+      style={{
+        height: "100vh",
+        backgroundColor: "#fff",
+        borderRight: "1px solid #d9d9d9",
+      }}
+      trigger={null}
+      collapsible
+      collapsed={collapsed}
+    >
+      {/* Logo Section */}
+      <div
+        style={{
+          height: 64,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "20px",
+          fontWeight: "bold",
+          color: "#1890ff",
+          background: "#fff",
+          marginBottom: "16px",
+        }}
+      >
+        {collapsed ? "🦷" : "DentalEase"}
+      </div>
+
+      {/* Main Menu */}
+      <Menu
+        theme="light"
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        items={menuItems}
+        style={{
+          fontSize: "16px",
+          borderRight: "none",
+        }}
+      />
+
+    {/* Logout Button - Styled Separately */}
+    <div
+      style={{
+        position: "absolute",
+        bottom: 10,
+        left: 10, // Aligns with menu item spacing
+        right: 10, // Aligns with menu item spacing
+        width: "calc(100% - 20px)", // Ensures it doesn't touch the edges
+        textAlign: "center",
+        padding: "12px 0",
+        cursor: "pointer",
+        fontSize: "16px",
+        fontWeight: "bold",
+        backgroundColor: "#FF4D4F", // Red background
+        color: "#fff", // White text
+        borderRadius: "6px", // Slightly rounded corners
+      }}
+      onClick={logOut}
+    >
+      {collapsed ? (
+        <LogoutOutlined />
+      ) : (
+        <span>
+          <LogoutOutlined /> Logout
+        </span>
+      )}
+    </div>
+    </Sider>
+  );
+}
+
+function App() {
+  const [collapsed, setCollapsed] = useState(false);
+  const { Sider, Content } = Layout;
+  const location = useLocation();
+  const isAuthenticated = sessionStorage.getItem("token") !== null;
+
+  const borderRadiusLG = "25px";
+  const colorBgContainer = theme === "dark" ? "#b0ccfc" : "#fff";
+
   const logOut = () => {
     sessionStorage.removeItem("token");
     window.location.href = "/login"; // Force logout
@@ -72,6 +223,45 @@ function App() {
   // if (!isAuthenticated) {
   //   return <LogIn />;
   // }
+
+  const menuItems = [
+    {
+      key: "/appointments",
+      icon: <UsergroupAddOutlined />,
+      label: <Link to="/appointments">Appointments</Link>,
+    },
+    {
+      key: "/view-records",
+      icon: <FolderViewOutlined />,
+      label: <Link to="/view-records">View Records</Link>,
+    },
+    {
+      key: "/add-patients",
+      icon: <UserAddOutlined />,
+      label: <Link to="/add-patients">Add Patients</Link>,
+    },
+    {
+      key: "/update-patients",
+      icon: <UpCircleOutlined />,
+      label: <Link to="/update-patients">Update Patients</Link>,
+    },
+    {
+      key: "/delete-patients",
+      icon: <DeleteOutlined />,
+      label: <Link to="/delete-patients">Delete Patients</Link>,
+    },
+    {
+      key: "/view-income",
+      icon: <DollarOutlined />,
+      label: <Link to="/view-income">View Income</Link>,
+    },
+    {
+      key: "/logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: logOut,
+    }
+  ];
 
   return (
     <ConfigProvider
@@ -84,41 +274,9 @@ function App() {
     {!isAuthenticated ? (
       <LogIn />
     ) : (      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
-        <Sider
-          style={{ backgroundColor: "#fff" }}
-          trigger={null}
-          collapsible
-          collapsed={collapsed}
-        >
-          <div className="demo-logo-vertical" />
-          <Menu
-            theme="light"
-            mode="inline"
-            // defaultSelectedKeys={["1"]}
-            selectedKeys={[location.pathname]}
-            items={menuItems}
-          />
-          <div className="logout-btn" onClick={logOut}>
-            <LogoutOutlined /> Logout
-          </div>
-        </Sider>
+        <Sidebar collapsed={collapsed} logOut={logOut} />
         <Layout>
-          <Header
-            style={{
-              padding: 0,
-              background: colorBgContainer,
-            }}
-          >
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: "16px",
-                width: 64,
-                height: 64,
-              }} />
-          </Header>
+          <CustomHeader collapsed={collapsed} setCollapsed={setCollapsed} />
           <Content
             style={{
               margin: "24px 16px",

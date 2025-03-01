@@ -16,16 +16,18 @@ import {
 import { PhoneOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 // import { useNavigate } from "react-router-dom";
-import {getPatientList} from "../../apiService";
+import { getPatientList } from "../../apiService";
 import { TableComponent } from "../../components/table/TableComponent";
 import { EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import moment from "moment";
 import { updatePatient } from "../../apiService";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
 export function UpdatePatients() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
   const [record, setRecord] = useState({});
@@ -88,7 +90,7 @@ export function UpdatePatients() {
   const onClose = () => {
     setOpen(false);
   };
-
+  
   return (
     <Flex vertical>
       <Typography>
@@ -99,6 +101,7 @@ export function UpdatePatients() {
         {/* <Button onClick={showDrawer}></Button> */}
       </Typography>
       <Drawer
+        key={record?._id}
         title="Update Patient"
         width={1100}
         onClose={onClose}
@@ -111,33 +114,33 @@ export function UpdatePatients() {
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onClose} type="primary">
+            {/* <Button onClick={onClose} type="primary">
               Update
-            </Button>
+            </Button> */}
           </Space>
         }
-      >
-        <UpdatePatientsForm data={record || {}} />
+        >
+      <UpdatePatientsForm data={record || {}}/>
       </Drawer>
     </Flex>
   );
 }
-export function UpdatePatientsForm({ data }) {
+export function UpdatePatientsForm({ data }){
   const [form] = Form.useForm();
 
-  // Set initial values
-  const initialValues = {
-    name: data.name || "",
-    age: data.age || null,
-    illnessType: data.illnessType || "",
-    contactNumber: data.contactNumber || "",
-    dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
-    notes: data.notes || "",
-    treatmentFee: data.treatmentFee || "",
-    medicationFee: data.medicationFee || "",
-  };
-
-  const onFinish = async (values) => {
+    // Set initial values
+    const initialValues = {
+      name: data.name || "",
+      age: data.age || null,
+      illnessType: data.illnessType || "",
+      contactNumber: data.contactNumber || "",
+      dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      notes: data.notes || "",
+      treatmentFee: data.treatmentFee || "",
+      medicationFee: data.medicationFee || "",
+    };
+  
+    const onFinish = async (values) => {
     try {
       const formattedValues = {
         ...values,
@@ -163,7 +166,6 @@ export function UpdatePatientsForm({ data }) {
       form={form}
       name="update-patient-form"
       layout="vertical"
-      initialValues={initialValues}
       onFinish={onFinish}
     >
       <Row gutter={16}>
@@ -270,10 +272,7 @@ export function UpdatePatientsForm({ data }) {
                 Clear
               </Button>
               <Button type="primary" icon={<PrinterOutlined />} />
-              <Button
-                type="primary"
-                style={{ backgroundColor: "#1890ff", color: "#fff" }}
-              >
+              <Button type="primary" style={{ backgroundColor: "#1890ff", color: "#fff" }}>
                 Patient Records
               </Button>
             </Space>

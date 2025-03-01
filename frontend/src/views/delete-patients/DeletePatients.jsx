@@ -108,7 +108,7 @@ export function DeletePatients() {
 
       <Space direction="vertical" size="large">
         <Row gutter={2}>
-          <Col span={100}>
+          <Col span={12}>
             <Search
               placeholder="Search by name or contact number"
               onChange={handleSearch}

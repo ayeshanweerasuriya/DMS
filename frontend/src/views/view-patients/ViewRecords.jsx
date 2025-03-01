@@ -14,6 +14,7 @@ import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { useNavigate } from "react-router-dom";
 import { getPatientList } from "../../apiService";
+import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -108,6 +109,23 @@ export function ViewRecords() {
             <Search
               placeholder="Search by name or contact number"
               onChange={handleSearch}
+            />
+          </Col>
+          <Col gutter={6}>
+          <DropdownMenu
+              label="Sort By Illness"
+              items={[
+                { key: "1", label: "Cavities" },
+                { key: "2", label: "Gingivitis" },
+                { key: "3", label: "Periodontitis" },
+                { key: "4", label: "Tooth Decay" },
+                { key: "5", label: "Oral Cancer" },
+                { key: "6", label: "Bruxism" },
+                { key: "7", label: "Impacted Teeth" },
+                { key: "8", label: "Tooth Sensitivity" },
+                { key: "9", label: "Halitosis" },
+                { key: "10", label: "TMJ Disorders" },
+              ]}
             />
           </Col>
           <Col style={{ marginLeft: "auto" }}>
