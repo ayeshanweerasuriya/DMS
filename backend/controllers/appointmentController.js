@@ -3,11 +3,24 @@ const Appointment = require("../models/dental/Appointment.js");
 // Get all appointments
 const getAppointments = async (req, res) => {
   try {
-      const appointments = await Appointment.find();
-      return res.status(200).json({ message: "Appointments retrieved successfully", appointments });
+    const searchQuery = req.query.search && req.query.search.trim(); // Sanitize search query
+
+    let filter = {};
+    if (searchQuery) {
+      filter = {
+        $or: [
+          { patientName: { $regex: searchQuery, $options: "i" } },
+          { contactNumber: { $regex: searchQuery, $options: "i" } },
+        ],
+      };
+    }
+    const appointments = await Appointment.find(filter);
+    return res
+      .status(200)
+      .json({ message: "Appointments retrieved successfully", appointments });
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Internal server error" });
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -64,7 +77,58 @@ const createAppointment = async (req, res) => {
   }
 };
 
+// Update an existing appointment
+const updateAppointment = async (req, res) => {
+    try {
+      const { id } = req.params; // Get appointment ID from the URL
+      const { patientName, appointmentDate, appointmentTime, contactNumber, patientAge } = req.body;
+
+      console.log("id: ", id);
+      console.log("req.body: ", req.body);
+  
+      // Find the appointment by ID
+      const appointment = await Appointment.findById(id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found.", status: 404 });
+      }
+  
+      // Validate fields (similar to createAppointment)
+      if (patientName) appointment.patientName = patientName;
+      if (appointmentDate) appointment.appointmentDate = appointmentDate;
+      if (appointmentTime) appointment.appointmentTime = appointmentTime;
+      if (contactNumber) appointment.contactNumber = contactNumber;
+      if (patientAge) appointment.patientAge = patientAge;
+  
+      // Save the updated appointment
+      await appointment.save();
+  
+      return res.status(200).json({ message: "Appointment updated successfully", appointment, status: 200 });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error", status: 500 });
+    }
+  };
+
+// Delete an appointment
+const deleteAppointment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedAppointment = await Appointment.findByIdAndDelete(id);
+
+        if (!deletedAppointment) {
+            return res.status(404).json({ message: "Appointment not found.", status: 404 });
+        }
+
+        res.status(200).json({ message: "Appointment deleted successfully", appointment: deletedAppointment, status: 200 });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error", status: 500 });
+    }
+};
+
 module.exports = {
   getAppointments,
-  createAppointment
+  createAppointment,
+  updateAppointment,
+  deleteAppointment
 };

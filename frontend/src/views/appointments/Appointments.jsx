@@ -14,25 +14,47 @@ import {
   Space,
   Drawer,
   message,
+  Menu,
+  Dropdown
 } from "antd";
 
 import {
   PhoneOutlined,
   CalendarOutlined,
   EditOutlined,
+  ReloadOutlined,
+  CheckOutlined,
+  EllipsisOutlined,
+  DeleteFilled
 } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { CalendarComponent as Calendar } from "../../components/calendar/CalendarComponent";
 import moment from "moment";
-import { createAppointment, getAppointmentsList } from "../../apiService";
+import { createAppointment, getAppointmentsList, deleteAppointment, updateAppointment } from "../../apiService";
 import { Message } from "../../components/message/Message";
+import VerticalSpace from "../../components/vertical-space";
 
-export function AppointmentForm({ setfetchdata }) {
-  // Receive function as prop
-  const [form] = Form.useForm(); // Create form instance
+const { Search } = Input;
 
+export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDrawer }) {
+  const [form] = Form.useForm();
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+
+    // Pre-fill the form if editing
+    useEffect(() => {
+      if (selectedRecord) {
+        const appointmentDate = moment(selectedRecord.appointmentDate);
+        form.setFieldsValue({
+          patientName: selectedRecord.patientName,
+          appointmentDate: !appointmentDate.isBefore(moment(), 'day') ? moment(selectedRecord.appointmentDate) : null,
+          appointmentTime: !appointmentDate.isBefore(moment(), 'day') ? moment(selectedRecord.appointmentTime, "HH:mm") : null,
+          patientAge: selectedRecord.patientAge,
+          contactNumber: selectedRecord.contactNumber,
+        });
+        setSelectedDate(moment(selectedRecord.appointmentDate));
+      }
+    }, [selectedRecord, form]);
 
   const handleCalendarButtonClick = () => {
     setIsCalendarVisible(!isCalendarVisible);
@@ -86,14 +108,25 @@ export function AppointmentForm({ setfetchdata }) {
     };
 
     try {
-      const response = await createAppointment(formattedValues);
+      let response;
+      if (selectedRecord) {
+        console.log("formattedValues: ", formattedValues);
+        console.log("selectedRecord._id: ", selectedRecord._id);
+        // If selectedRecord exists, call the updateAppointment function
+        response = await updateAppointment(selectedRecord._id, formattedValues);
+      } else {
+        // If no selectedRecord, create a new appointment
+        response = await createAppointment(formattedValues);
+      }
+      console.log('response.status: ', response.status);
       if (response.status === 200) {
         Message("success", response.message, 2);
-        setfetchdata(true);
         form.resetFields();
+        setRefetchData(true);
+        closeDrawer();
       }
     } catch (error) {
-      console.error("Failed to create appointment:", error);
+      console.error("Failed to save appointment:", error);
     }
   };
 
@@ -248,36 +281,58 @@ export function AppointmentForm({ setfetchdata }) {
 
 export function Appointments() {
   const { Title } = Typography;
-  const [appointments, setAppointments] = useState([]);
   const [data, setData] = useState([]);
-  const [fetchdata, setfetchdata] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  console.log("data: ", data);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [refetchData, setRefetchData] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [isApproveVisible, setIsApproveVisible] = useState(false);
 
   useEffect(() => {
-    getData();
-  }, []);
+    getAppointmentsList(searchQuery)
+      .then((response) => {
+        console.log("response: ", response);
+        setData(response.appointments);
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+      });
+      setRefetchData(false);
+  }, [searchQuery, refetchData]);
 
-  useEffect(() => {
-    if (fetchdata) {
-      getData();
-      setfetchdata(false);
-    }
-  }, [fetchdata]);
-
-  const getData = async () => {
-    getAppointmentsList()
-      .then((response) => setData(response.appointments))
-      .catch((error) => console.error("Error:", error));
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    setSearchQuery(value);
   };
-
-  const showDrawer = (record) => {
-    setSelectedAppointment(record);
+  
+  const onEdit = (record) => {
+    setSelectedRecord(record);
     setDrawerVisible(true);
   };
 
-  const closeDrawer = () => setDrawerVisible(false);
+  const onApprove = (record) => {
+    console.log("Approving record:", record);
+    setSelectedRecord(record);
+    setDrawerVisible(true);
+    setIsApproveVisible(true);
+  };
+
+  const onDelete = async (id) => {
+    try {
+      const response = await deleteAppointment(id);
+      if (response.status === 200) {
+        Message("success", response.message, 2);  
+        setRefetchData(true);
+      }
+    } catch (error) {
+      console.error("Failed to delete appointment:", error);
+    }
+  };
+
+  const closeDrawer = () => {
+    setDrawerVisible(false);
+    setSelectedRecord(null);
+  };
 
   const columns = [
     {
@@ -312,13 +367,43 @@ export function Appointments() {
     {
       title: "Actions",
       dataIndex: "actions",
-      render: (_, record) => (
-        <Button
-          type="link"
-          icon={<EditOutlined />}
-          onClick={() => showDrawer(record)}
-        />
-      ),
+      render: (_, record) => {
+        // Define the menu items
+        const menu = (
+          <Menu>
+            <Menu.Item
+              key="edit"
+              icon={<EditOutlined />}
+              onClick={() => onEdit(record)} // Edit action
+            >
+              Edit
+            </Menu.Item>
+            <Menu.Item
+              key="approve"
+              icon={<CheckOutlined style={{ color: "green" }} />}
+              onClick={() => onApprove(record)}
+            >
+              Approve
+            </Menu.Item>
+            <Menu.Item
+              key="delete"
+              icon={<DeleteFilled style={{ color: "red" }} />}
+              onClick={() => onDelete(record._id)}
+            >
+              Delete
+            </Menu.Item>
+          </Menu>
+        );
+    
+        return (
+          <Dropdown overlay={menu} trigger={['click']}>
+            <Button
+              type="link"
+              icon={<EllipsisOutlined />} // Kebab menu icon
+            />
+          </Dropdown>
+        );
+      },
     },
   ];
 
@@ -329,13 +414,31 @@ export function Appointments() {
           <Title level={2}>Add Appointments</Title>
         </Divider>
       </Typography>
-      <AppointmentForm setfetchdata={setfetchdata} />
+      <AppointmentForm setRefetchData={setRefetchData} />
       <Divider style={{ borderColor: "#000" }} />
       <Typography>
         <Divider orientation="left">
           <Title level={2}>Appointments</Title>
         </Divider>
       </Typography>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Search
+            placeholder="Search by name or contact number"
+            onChange={handleSearch}
+          />
+        </Col>
+        <Col span={12}>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => setRefetchData(true)}
+            type="primary"
+          >
+            Refetch Data
+          </Button>
+        </Col>
+      </Row>
+      <VerticalSpace height={"20px"} />
       <TableComponent columns={columns} data={data} />
       {/* Drawer Component */}
       <Drawer
@@ -344,28 +447,14 @@ export function Appointments() {
         open={drawerVisible}
         onClose={closeDrawer}
       >
-        {selectedAppointment && (
-          <div>
-            <p>
-              <strong>Patient Name:</strong> {selectedAppointment.patientName}
-            </p>
-            <p>
-              <strong>Date:</strong>{" "}
-              {new Date(
-                selectedAppointment.appointmentDate
-              ).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Time:</strong> {selectedAppointment.appointmentTime}
-            </p>
-            <p>
-              <strong>Age:</strong> {selectedAppointment.patientAge}
-            </p>
-            <p>
-              <strong>Contact Number:</strong>{" "}
-              {selectedAppointment.contactNumber}
-            </p>
-          </div>
+        {selectedRecord && (
+          <>
+            <AppointmentForm
+              setRefetchData={setRefetchData}
+              selectedRecord={selectedRecord}
+              closeDrawer={closeDrawer}
+            />
+          </>
         )}
       </Drawer>
     </Flex>

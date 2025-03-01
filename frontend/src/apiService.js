@@ -113,12 +113,29 @@ export const createAppointment = async (data) => {
   }
 };
 
-export async function getAppointmentsList() {
+export const getAppointmentsList = async (searchQuery = "") => {
   try {
-    const response = await api.get("/api/appointment"); // Axios handles errors better
+    const response = await api.get(`/api/appointment?search=${searchQuery}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching appointments:", error);
-    return { appointments: [] };
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
+export const updateAppointment = async (id, data) => {
+  try {
+    const response = await api.patch(`/api/appointment/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
+export const deleteAppointment = async (id) => {
+  try {
+    const response = await api.delete(`/api/appointment/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : 'An error occurred';
   }
 }
