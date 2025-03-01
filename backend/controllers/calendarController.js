@@ -1,29 +1,48 @@
-const Calendar = require("../models/dental/Calendar.js");
-// Fetch calendar data (patient name, appointment date, and appointment time)
-const getCalendarAppointments = async (req, res) => {
+const Appointment = require("../models/dental/Appointment.js");
+
+const getCalendarData = async (req, res) => {
     try {
-        const appointments = await Appointment.find({}, "patientName appointmentDate appointmentTime");
+        // Get the current date to determine if the date is today or in the future
+        const currentDate = new Date().setHours(0, 0, 0, 0); // Normalize to 00:00:00 for accurate comparison
 
-        // Check if appointments exist
-        if (!appointments || appointments.length === 0) {
-            return res.status(404).json({ message: "No appointments found", status: 404 });
-        }
+        // Query appointments and group them by appointmentDate
+        const appointments = await Appointment.aggregate([
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$appointmentDate" } },
+                    appointments: {
+                        $push: {
+                            patientName: "$patientName",
+                            appointmentDate: "$appointmentDate",
+                            appointmentTime: "$appointmentTime",
+                            contactNumber: "$contactNumber",
+                            patientAge: "$patientAge",
+                            createdAt: "$createdAt"
+                        }
+                    }
+                }
+            },
+            {
+                $sort: { "_id": 1 } // Sort by date in ascending order
+            }
+        ]);
 
-        // Validate date format
-        const validAppointments = appointments.filter(app => {
-            const isValidDate = !isNaN(new Date(app.appointmentDate).getTime());
-            return isValidDate;
+        // Structure the response data
+        const result = appointments.map(appointment => {
+            const date = appointment._id; // This will be the date string like '2023-11-15'
+            const totalAppointments = appointment.appointments.length;
+            const active = new Date(date) >= currentDate; // Check if it's today or in the future
+
+            return {
+                date: date,
+                totalAppointments: totalAppointments,
+                active: active,
+                appointments: appointment.appointments
+            };
         });
 
-        if (validAppointments.length === 0) {
-            return res.status(400).json({ message: "Invalid appointment date format in records", status: 400 });
-        }
+        return res.status(200).json(result); // Send back the formatted response
 
-        return res.status(200).json({
-            message: "Calendar data retrieved successfully",
-            appointments: validAppointments,
-            status: 200
-        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error", status: 500 });
@@ -31,5 +50,5 @@ const getCalendarAppointments = async (req, res) => {
 };
 
 module.exports = {
-    getCalendarAppointments
+    getCalendarData
 };

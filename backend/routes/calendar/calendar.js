@@ -4,6 +4,6 @@ const authenticate = require("../../middleware/authenticate.js");
 
 const router = express.Router();
 
-router.get("/", authenticate, calendarController.getCalendarAppointments);
+router.get("/", authenticate, calendarController.getCalendarData);
 
 module.exports = router;
