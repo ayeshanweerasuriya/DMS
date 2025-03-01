@@ -126,6 +126,7 @@ export function UpdatePatients() {
   );
 }
 export function UpdatePatientsForm({ data }){
+  const navigate = useNavigate();
   const [form] = Form.useForm();
 
     // Set initial values
@@ -249,8 +250,8 @@ export function UpdatePatientsForm({ data }){
             <Input size="large" />
           </Form.Item>
 
-          <Form.Item label="Hospital Fee" name="medicationFee">
-            <Input size="large" />
+          <Form.Item label="Hospital Fee" name="hospitalFee">
+            <Input size="large" disabled />
           </Form.Item>
         </Col>
 
@@ -271,8 +272,7 @@ export function UpdatePatientsForm({ data }){
               <Button type="default" onClick={() => form.resetFields()}>
                 Clear
               </Button>
-              <Button type="primary" icon={<PrinterOutlined />} />
-              <Button type="primary" style={{ backgroundColor: "#1890ff", color: "#fff" }}>
+              <Button type="primary" style={{ backgroundColor: "#1890ff", color: "#fff" }} onClick={() => navigate("/view-records")}>
                 Patient Records
               </Button>
             </Space>

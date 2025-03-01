@@ -65,7 +65,7 @@ export function CustomHeader({ collapsed, setCollapsed }) {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "0 20px",
-        background: "#fff", // Use colorBgContainer if defined
+        background: "#1677ff",
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
@@ -82,15 +82,15 @@ export function CustomHeader({ collapsed, setCollapsed }) {
       />
 
       {/* Real-time Date & Time */}
-      <Text strong>
+      <Text strong style={{ fontSize: "16px", color: "#fff" }}>
         {currentTime.toLocaleDateString()} - {currentTime.toLocaleTimeString()}
       </Text>
 
       {/* User Info Section */}
       {user && (
         <Space>
-          <Text strong>{getGreeting()}, {user.displayname}!</Text>
-          <Text type="secondary">({user.role})</Text>
+          <Text style={{ fontSize: "16px", color: "#fff" }} strong>{getGreeting()}, {user.displayname}!</Text>
+          <Text style={{ fontSize: "16px", color: "#fff" }} type="secondary">({user.role})</Text>
           <UserOutlined style={{ fontSize: 20 }} />
         </Space>
       )}
@@ -159,7 +159,7 @@ export function Sidebar({ collapsed, logOut }) {
           marginBottom: "16px",
         }}
       >
-        {collapsed ? "🦷" : "DentalEase"}
+        {collapsed ? "🦷" : "🦷 DentalEase"}
       </div>
 
       {/* Main Menu */}
@@ -178,10 +178,10 @@ export function Sidebar({ collapsed, logOut }) {
     <div
       style={{
         position: "absolute",
-        bottom: 10,
-        left: 10, // Aligns with menu item spacing
-        right: 10, // Aligns with menu item spacing
-        width: "calc(100% - 20px)", // Ensures it doesn't touch the edges
+        bottom: 5,
+        left: 5, // Aligns with menu item spacing
+        right: 5, // Aligns with menu item spacing
+        width: "calc(100% - 10px)", // Ensures it doesn't touch the edges
         textAlign: "center",
         padding: "12px 0",
         cursor: "pointer",
@@ -223,45 +223,6 @@ function App() {
   // if (!isAuthenticated) {
   //   return <LogIn />;
   // }
-
-  const menuItems = [
-    {
-      key: "/appointments",
-      icon: <UsergroupAddOutlined />,
-      label: <Link to="/appointments">Appointments</Link>,
-    },
-    {
-      key: "/view-records",
-      icon: <FolderViewOutlined />,
-      label: <Link to="/view-records">View Records</Link>,
-    },
-    {
-      key: "/add-patients",
-      icon: <UserAddOutlined />,
-      label: <Link to="/add-patients">Add Patients</Link>,
-    },
-    {
-      key: "/update-patients",
-      icon: <UpCircleOutlined />,
-      label: <Link to="/update-patients">Update Patients</Link>,
-    },
-    {
-      key: "/delete-patients",
-      icon: <DeleteOutlined />,
-      label: <Link to="/delete-patients">Delete Patients</Link>,
-    },
-    {
-      key: "/view-income",
-      icon: <DollarOutlined />,
-      label: <Link to="/view-income">View Income</Link>,
-    },
-    {
-      key: "/logout",
-      icon: <LogoutOutlined />,
-      label: "Logout",
-      onClick: logOut,
-    }
-  ];
 
   return (
     <ConfigProvider
