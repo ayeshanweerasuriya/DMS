@@ -12,13 +12,14 @@ import {
   Col,
   Button,
   Space,
+  Drawer,
   message,
 } from "antd";
 
 import {
   PhoneOutlined,
   CalendarOutlined,
-  EyeOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { CalendarComponent as Calendar } from "../../components/calendar/CalendarComponent";
@@ -248,44 +249,35 @@ export function AppointmentForm({ setfetchdata }) {
 export function Appointments() {
   const { Title } = Typography;
   const [appointments, setAppointments] = useState([]);
-
-  // useEffect(() => {
-  //   getAppointmentsList()
-  //     .then((response) => {
-  //       if (response && response.appointments) {
-  //         setAppointments(response.appointments);
-  //       } else {
-  //         console.error("Invalid response structure:", response);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching appointments:", error);
-  //       message.error("Failed to fetch appointments.");
-  //     });
-  // }, []);
-
   const [data, setData] = useState([]);
   const [fetchdata, setfetchdata] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   console.log("data: ", data);
 
   useEffect(() => {
     getData();
   }, []);
+
   useEffect(() => {
-    getData();
-    setfetchdata(false);
+    if (fetchdata) {
+      getData();
+      setfetchdata(false);
+    }
   }, [fetchdata]);
 
   const getData = async () => {
     getAppointmentsList()
-      .then((response) => {
-        console.log("response: ", response);
-        setData(response.appointments);
-      })
-      .catch((error) => {
-        console.error("error: ", error);
-      });
+      .then((response) => setData(response.appointments))
+      .catch((error) => console.error("Error:", error));
   };
+
+  const showDrawer = (record) => {
+    setSelectedAppointment(record);
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => setDrawerVisible(false);
 
   const columns = [
     {
@@ -323,8 +315,8 @@ export function Appointments() {
       render: (_, record) => (
         <Button
           type="link"
-          icon={<EyeOutlined />}
-          onClick={() => handleView(record)}
+          icon={<EditOutlined />}
+          onClick={() => showDrawer(record)}
         />
       ),
     },
@@ -345,6 +337,37 @@ export function Appointments() {
         </Divider>
       </Typography>
       <TableComponent columns={columns} data={data} />
+      {/* Drawer Component */}
+      <Drawer
+        title="Update Appointments"
+        width={1100}
+        open={drawerVisible}
+        onClose={closeDrawer}
+      >
+        {selectedAppointment && (
+          <div>
+            <p>
+              <strong>Patient Name:</strong> {selectedAppointment.patientName}
+            </p>
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(
+                selectedAppointment.appointmentDate
+              ).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Time:</strong> {selectedAppointment.appointmentTime}
+            </p>
+            <p>
+              <strong>Age:</strong> {selectedAppointment.patientAge}
+            </p>
+            <p>
+              <strong>Contact Number:</strong>{" "}
+              {selectedAppointment.contactNumber}
+            </p>
+          </div>
+        )}
+      </Drawer>
     </Flex>
   );
 }
