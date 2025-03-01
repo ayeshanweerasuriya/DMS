@@ -12,11 +12,11 @@ import {
   Col,
   Button,
   Space,
+  Modal,
   Drawer,
   message,
   Menu,
   Dropdown,
-  Modal
 } from "antd";
 
 import {
@@ -205,7 +205,7 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
   const [form] = Form.useForm();
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
     // Pre-fill the form if editing
     useEffect(() => {
       if (selectedRecord) {
@@ -220,9 +220,15 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
         setSelectedDate(moment(selectedRecord.appointmentDate));
       }
     }, [selectedRecord, form]);
+  
+
+  const handleDateClick = (date) => {
+    setSelectedDate(date.format("YYYY-MM-DD")); // Store clicked date
+    setIsModalOpen(true); // Open modal
+  };
 
   const handleCalendarButtonClick = () => {
-    setIsCalendarVisible(!isCalendarVisible);
+    setIsCalendarVisible((prev) => !prev);
   };
 
   const disabledDate = (current) => {
@@ -288,7 +294,9 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
         Message("success", response.message, 2);
         form.resetFields();
         setRefetchData(true);
-        closeDrawer();
+        if (selectedRecord){
+          closeDrawer();
+        }
       }
     } catch (error) {
       console.error("Failed to save appointment:", error);
@@ -296,6 +304,7 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
   };
 
   return (
+    <>
     <Form
       form={form} // Attach form instance
       onFinish={onFinish}
@@ -413,7 +422,7 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
                 type="primary"
                 htmlType="submit"
               >
-                Update Appointment
+                {selectedRecord ? "Update Appointment" : "Add Appointment"}
               </Button>
               <Button
                 style={{ backgroundColor: "#000", color: "#fff" }}
@@ -423,6 +432,7 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
               >
                 Clear
               </Button>
+              
               <Button
                 size="large"
                 type="primary"
@@ -433,12 +443,20 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
           </Form.Item>
         </Col>
       </Row>
-      {isCalendarVisible && (
-        <div style={{ marginTop: "20px" }}>
-          <Calendar />
-        </div>
-      )}
+      {isCalendarVisible && (<Calendar onSelect={handleDateClick} />)}
+      
     </Form>
+    <Modal 
+  title="Appointment Details"
+  open={isModalOpen} 
+  onCancel={() => setIsModalOpen(false)} 
+  footer={null}
+>
+  <p>You clicked on: {selectedDate}</p>
+  <p>Show additional details here...</p>
+</Modal>
+
+</>
   );
 }
 
