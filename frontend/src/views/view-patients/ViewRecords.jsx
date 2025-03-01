@@ -128,6 +128,7 @@ export function ViewRecords() {
               ]}
             />
           </Col>
+          <Col gutter={6}></Col>
           <Col style={{ marginLeft: "auto" }}>
             <Tooltip title="Add Patient">
               <Button
