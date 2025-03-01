@@ -31,17 +31,19 @@ export function UpdatePatients() {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
   const [record, setRecord] = useState({});
+  const [refetch, setRefetch]=useState(false);
 
   useEffect(() => {
     getPatientList()
       .then((response) => {
         console.log("response: ", response);
         setData(response.patients);
+        setRefetch(false)
       })
       .catch((error) => {
         console.error("error: ", error);
       });
-  }, []);
+  }, [refetch]);
 
   const columns = [
     {
@@ -120,14 +122,30 @@ export function UpdatePatients() {
           </Space>
         }
         >
-      <UpdatePatientsForm data={record || {}}/>
+      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose}/>
       </Drawer>
     </Flex>
   );
 }
-export function UpdatePatientsForm({ data }){
+export function UpdatePatientsForm({ data,setRefetch,onClose }){
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  
+console.log("sample data: ",data);
+useEffect(() => {
+  if (data) {
+    form.setFieldsValue({
+      name: data.name || "",
+      age: data.age || null,
+      illnessType: data.illnessType || "",
+      contactNumber: data.contactNumber || "",
+      dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      notes: data.notes || "",
+      treatmentFee: data.treatmentFee || "",
+      medicationFee: data.medicationFee || "",
+    });
+  }
+}, [data, form]);
 
     // Set initial values
     const initialValues = {
@@ -152,7 +170,9 @@ export function UpdatePatientsForm({ data }){
       const response = await updatePatient(data._id, formattedValues);
       console.log("response: ", response);
       if (response.status === 200) {
-        Message("success", response.message, 2, { marginRight: "60%" });
+        setRefetch(true)
+        Message("success", response.message, 2)
+        onClose()
       } else {
         Message("error", response.message, 5);
       }
