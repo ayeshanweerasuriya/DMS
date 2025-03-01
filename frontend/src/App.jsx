@@ -207,8 +207,7 @@ export function Sidebar({ collapsed, logOut }) {
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  const { Sider, Content } = Layout;
-  const location = useLocation();
+  const { Content } = Layout;
   const isAuthenticated = sessionStorage.getItem("token") !== null;
 
   const borderRadiusLG = "25px";
@@ -220,9 +219,9 @@ function App() {
   };
 
   // Show only the login page if the user is not authenticated
-  // if (!isAuthenticated) {
-  //   return <LogIn />;
-  // }
+  if (!isAuthenticated) {
+    return <LogIn />;
+  }
 
   return (
     <ConfigProvider
@@ -232,9 +231,7 @@ function App() {
         },
       }}
     >
-    {!isAuthenticated ? (
-      <LogIn />
-    ) : (      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
+      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
         <Sidebar collapsed={collapsed} logOut={logOut} />
         <Layout>
           <CustomHeader collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -260,7 +257,7 @@ function App() {
             </Routes>
           </Content>
         </Layout>
-      </Layout>)}
+      </Layout>
     </ConfigProvider>
   );
 }

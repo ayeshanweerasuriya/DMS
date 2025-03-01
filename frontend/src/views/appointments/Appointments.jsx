@@ -423,6 +423,12 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
               >
                 Clear
               </Button>
+              <Button
+                size="large"
+                type="primary"
+                icon={<CalendarOutlined />}
+                onClick={handleCalendarButtonClick}
+              />
             </Space>
           </Form.Item>
         </Col>
