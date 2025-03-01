@@ -15,7 +15,8 @@ import {
   Drawer,
   message,
   Menu,
-  Dropdown
+  Dropdown,
+  Modal
 } from "antd";
 
 import {
@@ -30,11 +31,175 @@ import {
 import { TableComponent } from "../../components/table/TableComponent";
 import { CalendarComponent as Calendar } from "../../components/calendar/CalendarComponent";
 import moment from "moment";
-import { createAppointment, getAppointmentsList, deleteAppointment, updateAppointment } from "../../apiService";
+import { createAppointment, getAppointmentsList, deleteAppointment, updateAppointment, createPatient } from "../../apiService";
 import { Message } from "../../components/message/Message";
 import VerticalSpace from "../../components/vertical-space";
+import { useNavigate } from "react-router-dom";
 
 const { Search } = Input;
+
+export function ApproveAppointmentForm({ selectedRecord, closeDrawer, onDelete, setRefetchData }) {
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
+
+  // Set initial values when selectedRecord changes
+  useEffect(() => {
+    if (selectedRecord) {
+      form.setFieldsValue({
+        name: selectedRecord.patientName || "",
+        age: selectedRecord.patientAge || null,
+        illnessType: "",
+        contactNumber: selectedRecord.contactNumber || "",
+        dateOfBirth: null,
+        notes: "",
+      });
+    }
+  }, [selectedRecord, form]);
+
+  const onFinish = async (values) => {
+    try {
+      const formattedValues = {
+        ...values,
+        dateOfBirth: values.dateOfBirth
+          ? values.dateOfBirth.format("YYYY-MM-DD")
+          : null,
+      };
+      const response = await createPatient(formattedValues);
+      console.log("response: ", response);
+      if (response.status === 201) {
+        Message("success", response.message, 2);
+        closeDrawer();
+      } else {
+        Message("error", response.message, 5);
+      }
+    } catch (error) {
+      console.error("Error updating patient:", error);
+      Message("error", "Failed to save patient", 3);
+    }
+    try {
+      const response = await deleteAppointment(selectedRecord._id);
+      if (response.status === 200) {
+        Message("success", response.message, 2);
+        setRefetchData(true);
+        closeDrawer();
+      }
+    } catch (error) {
+      console.error("Failed to delete appointment:", error);
+      Message("error", "Failed to delete appointment", 3);
+    }
+  };
+
+  return (
+    <Form
+      form={form}
+      name="update-patient-form"
+      layout="vertical"
+      onFinish={onFinish}
+    >
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="Patient Name"
+            name="name"
+            rules={[{ required: true }]}
+          >
+            <Input size="large" />
+          </Form.Item>
+
+          <Form.Item
+            label="Patient Age"
+            name="age"
+            rules={[{ required: true, message: "Patient age is required" }]}
+          >
+            <InputNumber
+              size="large"
+              min={1}
+              max={150}
+              changeOnWheel
+              parser={(value) => value.replace(/\D/g, "")} // Strips non-numeric input
+              onKeyPress={(e) => {
+                if (!/^\d+$/.test(e.key)) {
+                  e.preventDefault(); // Prevents non-numeric key press
+                }
+              }}
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Illness Type"
+            name="illnessType"
+            rules={[{ required: true }]}
+          >
+            <Input size="large" />
+          </Form.Item>
+
+          <Form.Item
+            label="Contact Number"
+            name="contactNumber"
+            rules={[
+              { required: true, message: "Contact number is required" },
+              {
+                pattern: /^[0-9]{10}$/,
+                message: "Contact number must be exactly 10 digits",
+              },
+            ]}
+          >
+            <Input
+              size="large"
+              prefix={<PhoneOutlined />}
+              maxLength={10}
+              placeholder="0701231231"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Date of Birth"
+            name="dateOfBirth"
+            rules={[{ required: true }]}
+          >
+            <DatePicker
+              size="large"
+              style={{ width: "100%" }}
+              disabledDate={(current) =>
+                current && current >= moment().endOf("day")
+              }
+            />
+          </Form.Item>
+        </Col>
+
+        <Col span={12}>
+          <Form.Item label="Patient Notes" name="notes">
+            <Input.TextArea rows={7} placeholder="Add Patient's Notes Here.." />
+          </Form.Item>
+
+          <Form.Item>
+            <Space size="large">
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ backgroundColor: "#16BE12", color: "#fff" }}
+              >
+                Approve
+              </Button>
+              <Button type="default" onClick={() => form.resetFields()}>
+                Clear
+              </Button>
+              <Button
+                type="primary"
+                style={{ backgroundColor: "#1890ff", color: "#fff" }}
+                onClick={() => navigate("/view-records")}
+              >
+                Patient Records
+              </Button>
+            </Space>
+          </Form.Item>
+        </Col>
+      </Row>
+    </Form>
+  );
+}
 
 export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDrawer }) {
   const [form] = Form.useForm();
@@ -248,9 +413,8 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
                 type="primary"
                 htmlType="submit"
               >
-                Add Appointment
+                Update Appointment
               </Button>
-
               <Button
                 style={{ backgroundColor: "#000", color: "#fff" }}
                 size="large"
@@ -259,13 +423,6 @@ export function AppointmentForm({ setRefetchData, selectedRecord = null, closeDr
               >
                 Clear
               </Button>
-
-              <Button
-                size="large"
-                type="primary"
-                icon={<CalendarOutlined />}
-                onClick={handleCalendarButtonClick}
-              />
             </Space>
           </Form.Item>
         </Col>
@@ -287,6 +444,9 @@ export function Appointments() {
   const [refetchData, setRefetchData] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isApproveVisible, setIsApproveVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  console.log("selectedRecord: ", selectedRecord);
 
   useEffect(() => {
     getAppointmentsList(searchQuery)
@@ -317,9 +477,9 @@ export function Appointments() {
     setIsApproveVisible(true);
   };
 
-  const onDelete = async (id) => {
+  const onDelete = async () => {
     try {
-      const response = await deleteAppointment(id);
+      const response = await deleteAppointment(selectedRecord._id);
       if (response.status === 200) {
         Message("success", response.message, 2);  
         setRefetchData(true);
@@ -327,11 +487,23 @@ export function Appointments() {
     } catch (error) {
       console.error("Failed to delete appointment:", error);
     }
+    setIsModalVisible(false);
   };
 
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedRecord(null);
+    setIsApproveVisible(false);
+  };
+
+  const showDeleteModal = (record) => {
+    setSelectedRecord(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModelCancel = () => {
+    setSelectedRecord(null);
+    setIsModalVisible(false);
   };
 
   const columns = [
@@ -388,7 +560,7 @@ export function Appointments() {
             <Menu.Item
               key="delete"
               icon={<DeleteFilled style={{ color: "red" }} />}
-              onClick={() => onDelete(record._id)}
+              onClick={() => showDeleteModal(record)}
             >
               Delete
             </Menu.Item>
@@ -440,21 +612,41 @@ export function Appointments() {
       </Row>
       <VerticalSpace height={"20px"} />
       <TableComponent columns={columns} data={data} />
+      <Modal
+        title="Confirm Deletion"
+        open={isModalVisible}
+        onOk={onDelete}
+        onCancel={handleModelCancel}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+      >
+        {selectedRecord && (
+          <p>Are you sure you want to delete <strong>{selectedRecord.patientName}</strong>?</p>
+        )}
+      </Modal>
       {/* Drawer Component */}
       <Drawer
-        title="Update Appointments"
+        title={isApproveVisible ? "Approve Appointment" : "Update Appointments"}
         width={1100}
         open={drawerVisible}
         onClose={closeDrawer}
       >
         {selectedRecord && (
-          <>
+          isApproveVisible ? (
+            <ApproveAppointmentForm
+              selectedRecord={selectedRecord}
+              closeDrawer={closeDrawer}
+              setRefetchData={setRefetchData}
+            />
+          ) : (
             <AppointmentForm
               setRefetchData={setRefetchData}
               selectedRecord={selectedRecord}
               closeDrawer={closeDrawer}
+              onDelete={onDelete}
             />
-          </>
+          )
         )}
       </Drawer>
     </Flex>

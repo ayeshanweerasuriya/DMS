@@ -1,5 +1,6 @@
 // src/apiService.js
 import axios from "axios";
+import { Message } from "./components/message/Message";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -24,10 +25,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-const logOut = () => {
-  window.location.href = "/login"; // Force logout
-};
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,7 +32,11 @@ api.interceptors.response.use(
       error.response &&
       (error.response.status === 403 || error.response.status === 401)
     ) {
-      logOut(); // Redirect to login
+      Message("error", "Your session has been expired. please login again", 2);
+      setTimeout(() => {
+        sessionStorage.removeItem("token");
+        window.location.href = "/login"; // Force logout 
+      }, 3000);
     }
     return Promise.reject(error);
   }
