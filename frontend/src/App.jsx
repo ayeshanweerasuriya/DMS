@@ -110,7 +110,7 @@ export function Sidebar({ collapsed, logOut }) {
     {
       key: "/view-records",
       icon: <FolderViewOutlined />,
-      label: <Link to="/view-records">View Records</Link>,
+      label: <Link to="/view-records">Patient Records</Link>,
     },
     {
       key: "/add-patients",

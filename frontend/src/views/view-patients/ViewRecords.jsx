@@ -23,11 +23,12 @@ export function ViewRecords() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("0");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
   useEffect(() => {
-    getPatientList(searchQuery)
+    getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
         setData(response.patients);
@@ -35,7 +36,7 @@ export function ViewRecords() {
       .catch((error) => {
         console.error("error: ", error);
       });
-  }, [searchQuery]);
+  }, [searchQuery, filter]);
 
   const handleSearch = (event) => {
     const value = event.target.value;
@@ -114,7 +115,10 @@ export function ViewRecords() {
           <Col gutter={6}>
           <DropdownMenu
               label="Sort By Illness"
+              defaultOption="All"
+              onItemSelect={(item) => setFilter(item.key)}
               items={[
+                { key: "0", label: "All" },
                 { key: "1", label: "Cavities" },
                 { key: "2", label: "Gingivitis" },
                 { key: "3", label: "Periodontitis" },
@@ -125,6 +129,7 @@ export function ViewRecords() {
                 { key: "8", label: "Tooth Sensitivity" },
                 { key: "9", label: "Halitosis" },
                 { key: "10", label: "TMJ Disorders" },
+                { key: "11", label: "Other" },
               ]}
             />
           </Col>

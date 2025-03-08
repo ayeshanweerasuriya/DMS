@@ -60,7 +60,7 @@ export const login = async (username, password) => {
 export const getPatientList = async (searchQuery = "", filter = null) => {
   console.log("searchQuery: ", searchQuery);
   try {
-    const response = await api.get(`/api/patient?search=${searchQuery}`);
+    const response = await api.get(`/api/patient?search=${searchQuery}&filter=${filter}`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : "An error occurred";
@@ -96,14 +96,14 @@ export const deletePatient = async (id) => {
   }
 }
 
-export const getAppointments = async () => {
-  try {
-    const response = await api.get("/api/appointment");
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : "An error occurred";
-  }
-};
+// export const getAppointments = async () => {
+//   try {
+//     const response = await api.get("/api/appointment");
+//     return response.data;
+//   } catch (error) {
+//     throw error.response ? error.response.data : "An error occurred";
+//   }
+// };
 
 export const createAppointment = async (data) => {
   try {
@@ -114,9 +114,10 @@ export const createAppointment = async (data) => {
   }
 };
 
-export const getAppointmentsList = async (searchQuery = "") => {
+export const getAppointmentsList = async (searchQuery = "", filter = null) => {
+  console.log("filter: ", filter);
   try {
-    const response = await api.get(`/api/appointment?search=${searchQuery}`);
+    const response = await api.get(`/api/appointment?search=${searchQuery}&filter=${filter}`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : "An error occurred";
@@ -140,3 +141,30 @@ export const deleteAppointment = async (id) => {
     throw error.response ? error.response.data : 'An error occurred';
   }
 }
+
+export const getCalendarData = async () => {
+  try {
+    const response = await api.get("/api/calendar");
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
+export const getIncomeStatistics = async () => {
+  try {
+    const response = await api.get("/api/income");
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
+export const updateHospitalFee = async (data) => {
+  try {
+    const response = await api.patch(`/api/income/`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};

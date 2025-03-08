@@ -1,20 +1,20 @@
 .dropdown-button {
   display: flex;
   align-items: center;
-  padding: 10px 20px; /* Adjust padding as needed */
-  background-color: #fff; /* Background color for the button */
-  border: 1px solid #d9d9d9; /* Border color */
-  border-radius: 4px; /* Rounded corners */
+  padding: 10px 20px;
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s; /* Transition for hover effect */
+  transition: background-color 0.2s;
   text-overflow: ellipsis;
   width: fit-content;
 }
 
 .dropdown-button:hover {
-  background-color: #e6f7ff; /* Change background on hover */
+  background-color: #e6f7ff;
 }
 
 .dropdown-button .anticon {
-  margin-left: 8px; /* Space between label and icon */
+  margin-left: 8px;
 }

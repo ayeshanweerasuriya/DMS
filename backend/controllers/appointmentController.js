@@ -3,21 +3,37 @@ const Appointment = require("../models/dental/Appointment.js");
 // Get all appointments
 const getAppointments = async (req, res) => {
   try {
-    const searchQuery = req.query.search && req.query.search.trim(); // Sanitize search query
+    const searchQuery = req.query.search && req.query.search.trim(); 
+    const filter = req.query.filter; 
 
-    let filter = {};
+    let query = {};
+
     if (searchQuery) {
-      filter = {
+      query = {
         $or: [
           { patientName: { $regex: searchQuery, $options: "i" } },
           { contactNumber: { $regex: searchQuery, $options: "i" } },
         ],
       };
     }
-    const appointments = await Appointment.find(filter);
-    return res
-      .status(200)
-      .json({ message: "Appointments retrieved successfully", appointments });
+
+    if (filter && filter !== "null") {
+      const filterDate = new Date(filter);
+      const startOfDay = new Date(filterDate.setHours(0, 0, 0, 0)); 
+      const endOfDay = new Date(new Date(startOfDay).setHours(23, 59, 59, 999));
+
+      query.appointmentDate = {
+        $gte: startOfDay,
+        $lt: endOfDay,
+      };
+    }
+
+    const appointments = await Appointment.find(query);
+
+    return res.status(200).json({
+      message: "Appointments retrieved successfully",
+      appointments,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });

@@ -11,6 +11,7 @@ import {
   Col,
   Button,
   Space,
+  Select
 } from "antd";
 import { PhoneOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
@@ -19,6 +20,7 @@ import { createPatient } from "../../apiService";
 import moment from "moment";
 import { NotificationAlert } from "../../components/notification-alert/NotificationAlert";
 
+const { Option } = Select;
 
 export function AddPatientsForm({handleRedirect}) {
   const [form] = Form.useForm(); // Form instance
@@ -50,6 +52,20 @@ export function AddPatientsForm({handleRedirect}) {
   const navigateToUpdateRecords = () => {
       navigate("/update-patients");
   };
+
+  const illnessOptions = [
+    { key: "1", label: "Cavities" },
+    { key: "2", label: "Gingivitis" },
+    { key: "3", label: "Periodontitis" },
+    { key: "4", label: "Tooth Decay" },
+    { key: "5", label: "Oral Cancer" },
+    { key: "6", label: "Bruxism" },
+    { key: "7", label: "Impacted Teeth" },
+    { key: "8", label: "Tooth Sensitivity" },
+    { key: "9", label: "Halitosis" },
+    { key: "10", label: "TMJ Disorders" },
+    { key: "11", label: "Other" },
+  ];
 
   return (
     <Form
@@ -92,9 +108,15 @@ export function AddPatientsForm({handleRedirect}) {
           <Form.Item
             label="Illness Type"
             name="illnessType"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please select an illness type" }]}
           >
-            <Input size="large" style={{ width: "100%" }} />
+            <Select size="large" placeholder="Select an illness type" style={{ width: "100%" }}>
+              {illnessOptions.map((item) => (
+                <Option key={item.key} value={item.label}>
+                  {item.label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item
             label="Contact Number"

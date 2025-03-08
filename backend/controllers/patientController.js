@@ -1,5 +1,19 @@
 const Patient = require("../models/dental/Patient.js");
 
+const illnessTypes = [
+    "Cavities",
+    "Gingivitis",
+    "Periodontitis",
+    "Tooth Decay",
+    "Oral Cancer",
+    "Bruxism",
+    "Impacted Teeth",
+    "Tooth Sensitivity",
+    "Halitosis",
+    "TMJ Disorders",
+    "Other",
+  ];
+
 const addPatient = async (req, res) => {
     try {
         const { name, age, illnessType, contactNumber, dateOfBirth, notes } = req.body;
@@ -20,8 +34,11 @@ const addPatient = async (req, res) => {
         }
 
         // Validate illness type length
-        if (illnessType.length > 200) {
-            return res.status(400).json({ message: "Illness type must be at most 200 characters.", status: 400 });
+        if (!illnessTypes.includes(illnessType)) {
+            return res.status(400).json({ 
+                message: "Invalid illness type. Please select a valid option.", 
+                status: 400 
+            });
         }
 
         // Validate contact number
@@ -102,28 +119,39 @@ const deletePatient = async (req, res) => {
 };
 
 const getPatients = async (req, res) => {
-  try {
-    const searchQuery = req.query.search; // Get search query from request
+    try {
+      const { search, filter } = req.query; // Get search and filter query parameters
+  
+      let query = {};
+  
+      // Apply search filter (name or contact number)
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } }, // Case-insensitive name search
+          { contactNumber: { $regex: search, $options: "i" } }, // Case-insensitive contact number search
+        ];
+      }
+  
+      // Apply illness type filter (ignore if "All" is selected)
+      if (filter && filter !== "0") {
 
-    let filter = {};
-    if (searchQuery) {
-      filter = {
-        $or: [
-          { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive name search
-          { contactNumber: { $regex: searchQuery, $options: "i" } }, // Case-insensitive contact number search
-        ],
-      };
+        const illnessIndex = parseInt(filter, 10); // Convert key to integer
+  
+        if (!isNaN(illnessIndex) && illnessIndex > 0 && illnessIndex <= illnessTypes.length) {
+          query.illnessType = illnessTypes[illnessIndex - 1]; // Match illnessType based on key
+        }
+      }
+  
+      const patients = await Patient.find(query);
+      return res
+        .status(200)
+        .json({ message: "Patients retrieved successfully", patients });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    const patients = await Patient.find(filter);
-    return res
-      .status(200)
-      .json({ message: "Patients retrieved successfully", patients });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
+  };
+  
 
 module.exports = {
     addPatient,
