@@ -12,6 +12,7 @@ import {
   Button,
   Space,
   Drawer,
+  Select
 } from "antd";
 import { PhoneOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
@@ -25,6 +26,7 @@ import { updatePatient } from "../../apiService";
 import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
+const { Option } = Select;
 
 export function UpdatePatients() {
   const navigate = useNavigate();
@@ -127,6 +129,7 @@ export function UpdatePatients() {
     </Flex>
   );
 }
+
 export function UpdatePatientsForm({ data,setRefetch,onClose }){
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -143,6 +146,7 @@ useEffect(() => {
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
+      hospitalFee: data.hospitalFee || "",
     });
   }
 }, [data, form]);
@@ -157,6 +161,7 @@ useEffect(() => {
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
+      hospitalFee: data.hospitalFee || "",
     };
   
     const onFinish = async (values) => {
@@ -181,6 +186,20 @@ useEffect(() => {
       Message("error", "Failed to save patient", 3);
     }
   };
+
+  const illnessOptions = [
+    { key: "1", label: "Cavities" },
+    { key: "2", label: "Gingivitis" },
+    { key: "3", label: "Periodontitis" },
+    { key: "4", label: "Tooth Decay" },
+    { key: "5", label: "Oral Cancer" },
+    { key: "6", label: "Bruxism" },
+    { key: "7", label: "Impacted Teeth" },
+    { key: "8", label: "Tooth Sensitivity" },
+    { key: "9", label: "Halitosis" },
+    { key: "10", label: "TMJ Disorders" },
+    { key: "11", label: "Other" },
+  ];
 
   return (
     <Form
@@ -223,9 +242,15 @@ useEffect(() => {
           <Form.Item
             label="Illness Type"
             name="illnessType"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please select an illness type" }]}
           >
-            <Input size="large" />
+            <Select size="large" placeholder="Select an illness type" style={{ width: "100%" }}>
+              {illnessOptions.map((item) => (
+                <Option key={item.key} value={item.label}>
+                  {item.label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
@@ -271,7 +296,7 @@ useEffect(() => {
           </Form.Item>
 
           <Form.Item label="Hospital Fee" name="hospitalFee">
-            <Input size="large" disabled />
+            <Input size="large" readOnly />
           </Form.Item>
         </Col>
 
