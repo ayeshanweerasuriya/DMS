@@ -8,15 +8,17 @@ import {
   Space,
   Button,
   Drawer,
+  Descriptions,
+  Input,
+  Tooltip
 } from "antd";
-import { Input, Tooltip } from "antd";
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { useNavigate } from "react-router-dom";
 import { getPatientList } from "../../apiService";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const { Search } = Input;
 
 export function ViewRecords() {
@@ -113,7 +115,7 @@ export function ViewRecords() {
             />
           </Col>
           <Col gutter={6}>
-          <DropdownMenu
+            <DropdownMenu
               label="Sort By Illness"
               defaultOption="All"
               onItemSelect={(item) => setFilter(item.key)}
@@ -149,53 +151,73 @@ export function ViewRecords() {
       <Drawer
         title="Patient Details"
         placement="right"
-        width={400}
+        width={480}
         onClose={handleCloseDrawer}
         open={isDrawerVisible}
       >
         {selectedPatient && (
-          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-            <Input addonBefore="Name" value={selectedPatient.name} readOnly />
-            <Input addonBefore="Age" value={selectedPatient.age} readOnly />
-            <Input
-              addonBefore="Illness"
-              value={selectedPatient.illnessType}
-              readOnly
-            />
-            <Input
-              addonBefore="Contact"
-              value={selectedPatient.contactNumber}
-              readOnly
-            />
-            <Input
-              addonBefore="DOB"
-              value={new Date(selectedPatient.dateOfBirth).toLocaleDateString()}
-              readOnly
-            />
-            <Input.TextArea
-              addonBefore="Notes"
-              value={selectedPatient.notes}
-              autoSize={{ minRows: 3 }}
-              readOnly
-            />
-            <Input
-              addonBefore="Medication Fee"
-              value={`$${selectedPatient.medicationFee}`}
-              readOnly
-            />
-            <Input
-              addonBefore="Treatment Fee"
-              value={`$${selectedPatient.treatmentFee}`}
-              readOnly
-            />
-            <Input
-              addonBefore="Created At"
-              value={new Date(selectedPatient.createdAt).toLocaleString()}
-              readOnly
-            />
-          </Space>
+          <DetailedView selectedPatient={selectedPatient} />
         )}
       </Drawer>
+      ;
     </Flex>
+  );
+}
+
+export function DetailedView({ selectedPatient }) {
+  return (
+    <Descriptions
+    column={1}
+    bordered
+    size="middle"
+    labelStyle={{ fontWeight: "bold" }}
+    labelBg
+  >
+    <Descriptions.Item label="Name">
+      {selectedPatient.name || "N/A"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Age">
+      {selectedPatient.age || "N/A"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Illness">
+      {selectedPatient.illnessType || "N/A"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Contact">
+      {selectedPatient.contactNumber || "N/A"}
+    </Descriptions.Item>
+    <Descriptions.Item label="DOB">
+      {selectedPatient.dateOfBirth
+        ? new Date(selectedPatient.dateOfBirth).toLocaleDateString()
+        : "N/A"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Notes">
+      <Paragraph
+        style={{ marginBottom: 0 }}
+        ellipsis={{ rows: 3, expandable: true, symbol: "Read more" }} // Collapsible notes section
+      >
+        {selectedPatient.notes || "No notes available"}
+      </Paragraph>
+    </Descriptions.Item>
+    <Descriptions.Item label="Medication Fee (Rs.)">
+      {selectedPatient.medicationFee
+        ? `Rs. ${selectedPatient.medicationFee}`
+        : "Rs. 0"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Treatment Fee (Rs.)">
+      {selectedPatient.treatmentFee
+        ? `Rs. ${selectedPatient.treatmentFee}`
+        : "Rs. 0"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Hospital Fee (Rs.)">
+      {selectedPatient.hospitalFee
+        ? `Rs. ${selectedPatient.hospitalFee}`
+        : "Rs. 0"}
+    </Descriptions.Item>
+    <Descriptions.Item label="Created At">
+      {selectedPatient.createdAt
+        ? new Date(selectedPatient.createdAt).toLocaleString()
+        : "N/A"}
+    </Descriptions.Item>
+  </Descriptions>
   );
 }
