@@ -14,7 +14,7 @@ import {
   Drawer,
   Select
 } from "antd";
-import { PhoneOutlined, PrinterOutlined } from "@ant-design/icons";
+import { PhoneOutlined, PlusOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 // import { useNavigate } from "react-router-dom";
 import { getPatientList } from "../../apiService";
@@ -24,7 +24,10 @@ import dayjs from "dayjs";
 import moment from "moment";
 import { updatePatient } from "../../apiService";
 import { useNavigate } from "react-router-dom";
+import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
+import VerticalSpace from "../../components/vertical-space";
 
+const { Search } = Input;
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -34,18 +37,24 @@ export function UpdatePatients() {
   const [data, setData] = useState([]);
   const [record, setRecord] = useState({});
   const [refetch, setRefetch]=useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("0");
 
   useEffect(() => {
-    getPatientList()
+    getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
         setData(response.patients);
-        setRefetch(false)
       })
       .catch((error) => {
         console.error("error: ", error);
       });
-  }, [refetch]);
+  }, [searchQuery, filter]);
+
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    setSearchQuery(value);
+  };
 
   const columns = [
     {
@@ -101,6 +110,36 @@ export function UpdatePatients() {
         <Divider orientation="left">
           <Title level={2}>Update Patients</Title>
         </Divider>
+        <Row gutter={24}>
+          <Col span={8}>
+            <Search
+              placeholder="Search by name or contact number"
+              onChange={handleSearch}
+            />
+          </Col>
+          <Col gutter={6}>
+            <DropdownMenu
+              label="Sort By Illness"
+              defaultOption="All"
+              onItemSelect={(item) => setFilter(item.key)}
+              items={[
+                { key: "0", label: "All" },
+                { key: "1", label: "Cavities" },
+                { key: "2", label: "Gingivitis" },
+                { key: "3", label: "Periodontitis" },
+                { key: "4", label: "Tooth Decay" },
+                { key: "5", label: "Oral Cancer" },
+                { key: "6", label: "Bruxism" },
+                { key: "7", label: "Impacted Teeth" },
+                { key: "8", label: "Tooth Sensitivity" },
+                { key: "9", label: "Halitosis" },
+                { key: "10", label: "TMJ Disorders" },
+                { key: "11", label: "Other" },
+              ]}
+            />
+          </Col>
+        </Row>
+        <VerticalSpace height={"20px"} />
         <TableComponent columns={columns} data={data || []} />
         {/* <Button onClick={showDrawer}></Button> */}
       </Typography>

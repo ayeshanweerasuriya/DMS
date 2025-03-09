@@ -13,7 +13,7 @@ import { login } from "../../apiService";
 import { Message } from "../../components/message/Message";
 
 export function LogIn() {
-  const [buttonState, setButtonState] = useState(true);
+  // const [buttonState, setButtonState] = useState(true);
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
@@ -36,21 +36,23 @@ export function LogIn() {
 
   return (
     <div className="login-component">
-      <div className="logo-name">
-        <img src="/login/logo.png" alt="logo" />
-        <h1>{"-DentalEase-"}</h1>
-        <h2>{"Dental Management System"}</h2>
-      </div>
+<div className="logo-name">
+  <img src="/login/logo.png" alt="DentalEase Logo" className="logo-img" />
+  <h1 className="logo-title">DentalEase</h1>
+  <h2 className="logo-subtitle">Dental Management System</h2>
+</div>
       <div className="login">
-        <h3>Choose your account type</h3>
+        <h3 className="form-heading">Choose your account type</h3>
         <div style={{ display: "flex", marginTop: "10px" }}>
           <div
             className="block"
-            onClick={() => setButtonState(false)}
+            // onClick={() => setButtonState(false)}
             style={{
               marginRight: "2.5px",
-              backgroundColor: buttonState ? "#8eaad4" : "#4187f0",
-              color: buttonState ? "#000" : "#fff",
+              // backgroundColor: buttonState ? "#8eaad4" : "#4187f0",
+              // color: buttonState ? "#000" : "#fff",
+              backgroundColor: "#4187f0",
+              color: "#fff",
             }}
           >
             <img src="/login/staff.svg" alt="staff" style={{borderColor: "#fff"}}/>
@@ -61,11 +63,13 @@ export function LogIn() {
           </div>
           <div
             className="block"
-            onClick={() => setButtonState(true)}
+            // onClick={() => setButtonState(true)}
             style={{
               marginLeft: "2.5px",
-              backgroundColor: buttonState ? "#4187f0" : "#8eaad4",
-              color: buttonState ? "#fff" : "#000",
+              // backgroundColor: buttonState ? "#4187f0" : "#8eaad4",
+              // color: buttonState ? "#fff" : "#000",
+              backgroundColor: "#4187f0",
+              color: "#fff",
             }}
           >
             <img src="/login/doctor.svg" alt="doctor" />
