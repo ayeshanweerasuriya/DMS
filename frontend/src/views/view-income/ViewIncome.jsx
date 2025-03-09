@@ -13,8 +13,8 @@ import {
 } from "antd";
 import { TableComponent } from "../../components/table/TableComponent";
 import { getIncomeStatistics, updateHospitalFee } from "../../apiService";
-import { saveAs } from 'file-saver';
-import { jsPDF } from 'jspdf';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { InvoicePDF } from './InvoicePDF';
 
 export function ViewIncome() {
   const { Title } = Typography;
@@ -50,42 +50,6 @@ export function ViewIncome() {
       console.error("error: ", error);
       message.error("Failed to save hospital charge");
     }
-  };
-
-  const handleDownloadInvoice = (record) => {
-    const doc = new jsPDF();
-    
-    // Adding Header with Dental Clinic Details
-    doc.setFontSize(18);
-    doc.text('Dental Care Clinic', 14, 20);
-    doc.setFontSize(12);
-    doc.text('Address: 1234 Dental Street, City, Country', 14, 30);
-    doc.text('Contact: +1234567890', 14, 35);
-    doc.text('Website: www.dentalcareclinic.com', 14, 40);
-  
-    // Adding Title
-    doc.setFontSize(16);
-    doc.text('Invoice', 105, 50, { align: 'center' });
-  
-    // Adding Patient and Staff Details
-    doc.setFontSize(12);
-    doc.text(`Patient Name: ${record.name}`, 14, 60);
-    doc.text(`Staff: Dr. John Doe`, 14, 65);
-    doc.text(`Date: ${new Date(record.createdAt).toLocaleDateString()}`, 14, 70);
-    doc.text(`Time: ${new Date(record.createdAt).toLocaleTimeString()}`, 14, 75);
-  
-    // Adding Treatment Fees
-    doc.text(`Treatment Fee: ₹${record.treatmentFee}`, 14, 85);
-    doc.text(`Medication Fee: ₹${record.medicationFee}`, 14, 90);
-    doc.text(`Hospital Fee: ₹${record.hospitalFee}`, 14, 95);
-    doc.text(`Total Fee: ₹${record.totalFee}`, 14, 100);
-  
-    // Footer with a Thank You Note
-    doc.setFontSize(10);
-    doc.text('Thank you for choosing Dental Care Clinic. We look forward to your next visit!', 14, 110);
-    
-    // Save the generated PDF
-    doc.save(`Invoice-${record.name}.pdf`);
   };
 
   console.log("eachPatientFee: ", eachPatientFee);
@@ -131,15 +95,14 @@ export function ViewIncome() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button 
-          type="primary" 
-          size="small"
-          onClick={() => handleDownloadInvoice(record)}
+        <PDFDownloadLink 
+          document={<InvoicePDF record={record} />} 
+          fileName={`Invoice-${record.name}.pdf`}
         >
-          Download Invoice
-        </Button>
+          {({ loading }) => (loading ? 'Loading document...' : 'Download Invoice')}
+        </PDFDownloadLink>
       ),
-    },
+    }
   ];
 
   return (
