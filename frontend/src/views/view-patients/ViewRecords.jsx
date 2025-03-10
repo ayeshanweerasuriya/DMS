@@ -10,13 +10,15 @@ import {
   Drawer,
   Descriptions,
   Input,
-  Tooltip
+  Tooltip,
+  Skeleton,
 } from "antd";
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
 import { useNavigate } from "react-router-dom";
-import { getPatientList } from "../../apiService";
+import { getPatientList, getTreatment } from "../../apiService";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
+import "./index.css";
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -24,10 +26,12 @@ const { Search } = Input;
 export function ViewRecords() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [treatment, setTreatment] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("0");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getPatientList(searchQuery, filter)
@@ -39,6 +43,24 @@ export function ViewRecords() {
         console.error("error: ", error);
       });
   }, [searchQuery, filter]);
+
+  console.log("selectedPatient: ", selectedPatient);
+  console.log("treatment: ", treatment);
+
+  useEffect(() => {
+    if (selectedPatient?._id) {
+      setIsLoading(true);
+      getTreatment(selectedPatient._id)
+        .then((response) => {
+          setTreatment(response.recommendation);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching treatment:", error);
+          setIsLoading(false);
+        });
+    }
+  }, [selectedPatient]);
 
   const handleSearch = (event) => {
     const value = event.target.value;
@@ -58,6 +80,7 @@ export function ViewRecords() {
   const handleCloseDrawer = () => {
     setIsDrawerVisible(false);
     setSelectedPatient(null);
+    setTreatment("");
   };
 
   const columns = [
@@ -156,7 +179,17 @@ export function ViewRecords() {
         open={isDrawerVisible}
       >
         {selectedPatient && (
-          <DetailedView selectedPatient={selectedPatient} />
+          <>
+            <DetailedView selectedPatient={selectedPatient} />
+
+            <div style={{ marginTop: "20px" }}>
+              {isLoading ? (
+                <Skeleton active paragraph={{ rows: 1 }} />
+              ) : (
+                <TypingEffect text={treatment} />
+              )}
+            </div>
+          </>
         )}
       </Drawer>
       ;
@@ -167,57 +200,98 @@ export function ViewRecords() {
 export function DetailedView({ selectedPatient }) {
   return (
     <Descriptions
-    column={1}
-    bordered
-    size="middle"
-    labelStyle={{ fontWeight: "bold" }}
-    labelBg
-  >
-    <Descriptions.Item label="Name">
-      {selectedPatient.name || "N/A"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Age">
-      {selectedPatient.age || "N/A"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Illness">
-      {selectedPatient.illnessType || "N/A"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Contact">
-      {selectedPatient.contactNumber || "N/A"}
-    </Descriptions.Item>
-    <Descriptions.Item label="DOB">
-      {selectedPatient.dateOfBirth
-        ? new Date(selectedPatient.dateOfBirth).toLocaleDateString()
-        : "N/A"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Notes">
-      <Paragraph
-        style={{ marginBottom: 0 }}
-        ellipsis={{ rows: 3, expandable: true, symbol: "Read more" }} // Collapsible notes section
-      >
-        {selectedPatient.notes || "No notes available"}
-      </Paragraph>
-    </Descriptions.Item>
-    <Descriptions.Item label="Medication Fee (Rs.)">
-      {selectedPatient.medicationFee
-        ? `Rs. ${selectedPatient.medicationFee}`
-        : "Rs. 0"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Treatment Fee (Rs.)">
-      {selectedPatient.treatmentFee
-        ? `Rs. ${selectedPatient.treatmentFee}`
-        : "Rs. 0"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Hospital Fee (Rs.)">
-      {selectedPatient.hospitalFee
-        ? `Rs. ${selectedPatient.hospitalFee}`
-        : "Rs. 0"}
-    </Descriptions.Item>
-    <Descriptions.Item label="Created At">
-      {selectedPatient.createdAt
-        ? new Date(selectedPatient.createdAt).toLocaleString()
-        : "N/A"}
-    </Descriptions.Item>
-  </Descriptions>
+      column={1}
+      bordered
+      size="middle"
+      labelStyle={{ fontWeight: "bold" }}
+      labelBg
+    >
+      <Descriptions.Item label="Name">
+        {selectedPatient.name || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Age">
+        {selectedPatient.age || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Illness">
+        {selectedPatient.illnessType || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Contact">
+        {selectedPatient.contactNumber || "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="DOB">
+        {selectedPatient.dateOfBirth
+          ? new Date(selectedPatient.dateOfBirth).toLocaleDateString()
+          : "N/A"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Notes">
+        <Paragraph
+          style={{ marginBottom: 0 }}
+          ellipsis={{ rows: 3, expandable: true, symbol: "Read more" }} // Collapsible notes section
+        >
+          {selectedPatient.notes || "No notes available"}
+        </Paragraph>
+      </Descriptions.Item>
+      <Descriptions.Item label="Medication Fee (Rs.)">
+        {selectedPatient.medicationFee
+          ? `Rs. ${selectedPatient.medicationFee}`
+          : "Rs. 0"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Treatment Fee (Rs.)">
+        {selectedPatient.treatmentFee
+          ? `Rs. ${selectedPatient.treatmentFee}`
+          : "Rs. 0"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Hospital Fee (Rs.)">
+        {selectedPatient.hospitalFee
+          ? `Rs. ${selectedPatient.hospitalFee}`
+          : "Rs. 0"}
+      </Descriptions.Item>
+      <Descriptions.Item label="Created At">
+        {selectedPatient.createdAt
+          ? new Date(selectedPatient.createdAt).toLocaleString()
+          : "N/A"}
+      </Descriptions.Item>
+    </Descriptions>
+  );
+}
+
+export function TypingEffect({ text }) {
+  const [displayText, setDisplayText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showCursor, setShowCursor] = useState(true);
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText((prev) => prev + text[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
+      }, 30);
+
+      return () => clearTimeout(timeout);
+    } else {
+      const cursorTimeout = setTimeout(() => {
+        setShowCursor(false);
+      }, 1000);
+      return () => clearTimeout(cursorTimeout);
+    }
+  }, [currentIndex, text]);
+
+  useEffect(() => {
+    setDisplayText("");
+    setCurrentIndex(0);
+    setShowCursor(true);
+  }, [text]);
+
+  return (
+    <Space direction="vertical" size="large">
+      <Divider orientation="left">Treatment Recommendation</Divider>
+      <div className="chat-message">
+        <div className="chat-avatar">AI</div>
+        <div className="chat-bubble">
+          {displayText}
+          {showCursor && <span className="typing-cursor">|</span>}
+        </div>
+      </div>
+    </Space>
   );
 }
