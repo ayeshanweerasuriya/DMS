@@ -115,7 +115,7 @@ export function ViewIncome() {
         <Col span={16}>
           <TableComponent columns={columns} data={eachPatientFee} />
         </Col>
-        <Col span={5}>
+        <Col span={8}>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
             <Card
               title="Today Income"
