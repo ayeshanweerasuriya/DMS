@@ -1,10 +1,8 @@
-// src/apiService.js
 import axios from "axios";
 import { Message } from "./components/message/Message";
 
 const BASE_URL = "http://localhost:8000";
 
-// Create an Axios instance with base URL and default headers
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -30,13 +28,15 @@ api.interceptors.response.use(
   (error) => {
     if (
       error.response &&
-      (error.response.status === 403 || error.response.status === 401)
+      (error.response.status === 403 || error.response.status === 401 && !error.response.data.error === "Invalid username or password")
     ) {
-      Message("error", "Your session has been expired. please login again", 2);
+      Message("error", "Your session has expired. Please log in again", 2);
       setTimeout(() => {
         sessionStorage.removeItem("token");
         window.location.href = "/login"; // Force logout 
       }, 3000);
+    } else if (error.response && error.response.data.error === "Invalid username or password") {
+      Message("error", "Invalid username or password", 2);
     }
     return Promise.reject(error);
   }

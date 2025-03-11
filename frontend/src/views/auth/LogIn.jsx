@@ -19,11 +19,14 @@ export function LogIn() {
   const onFinish = async (values) => {
     try {
       const data = await login(values.username, values.password);
-      console.log("data: ", data);
       if (data.status === 200 && data.token) {
         Message("success", "Login successful", 2);
         setTimeout(() => {
-          navigate("/appointments", { replace: true });
+          if (data.role === "Doctor") {
+            navigate("/view-records");
+          } else {
+            navigate("/appointments");
+          }
         }, 2000);
       } else {
         Message("error", "Invalid username or password", 5);
@@ -55,7 +58,7 @@ export function LogIn() {
               color: "#fff",
             }}
           >
-            <img src="/login/staff.svg" alt="staff" style={{borderColor: "#fff"}}/>
+            <img src="/login/staff.svg" height={"150px"} width={"125px"} alt="staff" />
             <p className="block-text">Staff</p>
           </div>
           <div className="or-container">
@@ -72,7 +75,7 @@ export function LogIn() {
               color: "#fff",
             }}
           >
-            <img src="/login/doctor.svg" alt="doctor" />
+            <img src="/login/doctor.svg" height={"150px"} width={"125px"} alt="doctor" />
             <p className="block-text">Doctor</p>
           </div>
         </div>

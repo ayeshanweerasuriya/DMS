@@ -18,7 +18,7 @@ import { TableComponent } from "../../components/table/TableComponent";
 import { useNavigate } from "react-router-dom";
 import { getPatientList, getTreatment } from "../../apiService";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
-import "./index.css";
+import "./ViewRecords.css";
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
