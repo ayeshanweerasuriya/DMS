@@ -29,7 +29,8 @@ import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
 import { ViewIncome } from "./views/view-income/ViewIncome";
-import { Message } from "./components/message/Message";
+import { NotFound } from "./views/not-found/NotFound";
+import { ProtectedRoute } from "./utils/ProtectedRoute";
 import { DateTime } from "luxon";
 
 const { Header, Sider } = Layout;
@@ -133,39 +134,50 @@ export function CustomHeader({ collapsed, setCollapsed }) {
 export function Sidebar({ collapsed, logOut }) {
   const location = useLocation();
   const [showText, setShowText] = useState(false);
+  const userRole = sessionStorage.getItem("role");
 
   const menuItems = [
     {
       key: "/appointments",
       icon: <UsergroupAddOutlined />,
       label: <Link to="/appointments">Appointments</Link>,
+      allowedRoles: ["Staff", "Admin"],
     },
     {
       key: "/view-records",
       icon: <FolderViewOutlined />,
       label: <Link to="/view-records">Patient Records</Link>,
+      allowedRoles: ["Doctor", "Admin"],
     },
     {
       key: "/add-patients",
       icon: <UserAddOutlined />,
       label: <Link to="/add-patients">Add Patients</Link>,
+      allowedRoles: ["Staff", "Admin"],
     },
     {
       key: "/update-patients",
       icon: <UpCircleOutlined />,
       label: <Link to="/update-patients">Update Patients</Link>,
+      allowedRoles: ["Doctor", "Staff", "Admin"],
     },
     {
       key: "/delete-patients",
       icon: <DeleteOutlined />,
       label: <Link to="/delete-patients">Delete Patients</Link>,
+      allowedRoles: ["Staff", "Admin"],
     },
     {
       key: "/view-income",
       icon: <DollarOutlined />,
       label: <Link to="/view-income">View Income</Link>,
+      allowedRoles: ["Doctor", "Admin"],
     },
   ];
+
+  const filteredMenuItems = menuItems.filter((item) =>
+    item.allowedRoles.includes(userRole)
+  );
 
   useEffect(() => {
     if (!collapsed) {
@@ -209,29 +221,28 @@ export function Sidebar({ collapsed, logOut }) {
         theme="light"
         mode="inline"
         selectedKeys={[location.pathname]}
-        items={menuItems}
+        items={filteredMenuItems}
         style={{
           fontSize: "16px",
           borderRight: "none",
         }}
       />
 
-      {/* Logout Button - Styled Separately */}
       <div
         style={{
           position: "absolute",
           bottom: 5,
-          left: 5, // Aligns with menu item spacing
-          right: 5, // Aligns with menu item spacing
-          width: "calc(100% - 10px)", // Ensures it doesn't touch the edges
+          left: 5,
+          right: 5,
+          width: "calc(100% - 10px)",
           textAlign: "center",
           padding: "12px 0",
           cursor: "pointer",
           fontSize: "16px",
           fontWeight: "bold",
-          backgroundColor: "#FF4D4F", // Red background
-          color: "#fff", // White text
-          borderRadius: "6px", // Slightly rounded corners
+          backgroundColor: "#FF4D4F",
+          color: "#fff",
+          borderRadius: "6px",
         }}
         onClick={logOut}
       >
@@ -258,10 +269,9 @@ function App() {
 
   const logOut = () => {
     sessionStorage.removeItem("token");
-    window.location.href = "/login"; // Force logout
+    window.location.href = "/login";
   };
 
-  // Show only the login page if the user is not authenticated
   if (!isAuthenticated) {
     return <LogIn />;
   }
@@ -292,18 +302,62 @@ function App() {
               <Routes>
                 <Route
                   path="/"
-                  element={<Navigate to="/appointments" replace />}
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <Navigate to="/appointments" replace />{" "}
+                    </ProtectedRoute>
+                  }
                 />
-                <Route path="/appointments" element={<Appointments />} />
-                <Route path="/view-records" element={<ViewRecords />} />
-                <Route path="/add-patients" element={<AddPatients />} />
-                <Route path="/update-patients" element={<UpdatePatients />} />
-                <Route path="/delete-patients" element={<DeletePatients />} />
-                <Route path="/view-income" element={<ViewIncome />} />
                 <Route
-                  path="*"
-                  element={<Navigate to="/appointments" replace />}
+                  path="/appointments"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <Appointments />
+                    </ProtectedRoute>
+                  }
                 />
+                <Route
+                  path="/view-records"
+                  element={
+                    <ProtectedRoute allowedRoles={["Doctor", "Admin"]}>
+                      <ViewRecords />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/add-patients"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <AddPatients />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/update-patients"
+                  element={
+                    <ProtectedRoute allowedRoles={["Doctor", "Staff", "Admin"]}>
+                      <UpdatePatients />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/delete-patients"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <DeletePatients />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/view-income"
+                  element={
+                    <ProtectedRoute allowedRoles={["Doctor", "Admin"]}>
+                      <ViewIncome />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Content>
           </Layout>
