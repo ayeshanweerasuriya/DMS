@@ -168,3 +168,12 @@ export const updateHospitalFee = async (data) => {
     throw error.response ? error.response.data : "An error occurred";
   }
 };
+
+export const getTreatment = async (patientId) => {
+  try {
+    const response = await api.post(`/api/ai`, { patientId });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
