@@ -75,13 +75,25 @@ export function AppointmentForm({
     return {}; // For future dates, allow all times
   };
 
+  const handleDateChange = (date, dateString) => {
+    console.log("Raw Date Object:", date);
+    console.log("Formatted Date String:", dateString);
+    setSelectedDate(date);
+};
   const onFinish = async (values) => {
     // console.log("Original values: ", values);
-
+    if (!selectedDate) {
+      console.error("❌ No date selected!");
+      return;
+  }
+  
     // Format date to "YYYY-MM-DD"
-    const formattedDate = new Date(values.appointmentDate)
-      .toISOString()
-      .split("T")[0];
+   // Ensure correct conversion
+   const formattedDate = selectedDate.toISOString(); // Convert to valid ISO format
+
+   console.log("📅 Final Formatted Date Sent to Backend:", formattedDate);
+
+   createAppointment({ ...values, appointmentDate: formattedDate });
 
     // Format time to "HH:MM AM/PM"
     const timeObj = new Date(values.appointmentTime);
@@ -158,7 +170,7 @@ export function AppointmentForm({
                 size="large"
                 style={{ width: "100%" }}
                 disabledDate={disabledDate}
-                onChange={(date) => setSelectedDate(date)}
+                onChange={handleDateChange}
               />
             </Form.Item>
           </Col>
