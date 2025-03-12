@@ -76,23 +76,16 @@ export function AppointmentForm({
   };
 
   const handleDateChange = (date, dateString) => {
-    console.log("Raw Date Object:", date);
-    console.log("Formatted Date String:", dateString);
     setSelectedDate(date);
 };
   const onFinish = async (values) => {
-    // console.log("Original values: ", values);
     if (!selectedDate) {
-      console.error("❌ No date selected!");
       return;
   }
   
-    // Format date to "YYYY-MM-DD"
+   // Format date to "YYYY-MM-DD"
    // Ensure correct conversion
    const formattedDate = selectedDate.toISOString(); // Convert to valid ISO format
-
-   console.log("📅 Final Formatted Date Sent to Backend:", formattedDate);
-
    createAppointment({ ...values, appointmentDate: formattedDate });
 
     // Format time to "HH:MM AM/PM"
@@ -113,15 +106,12 @@ export function AppointmentForm({
     try {
       let response;
       if (selectedRecord) {
-        console.log("formattedValues: ", formattedValues);
-        console.log("selectedRecord._id: ", selectedRecord._id);
         // If selectedRecord exists, call the updateAppointment function
         response = await updateAppointment(selectedRecord._id, formattedValues);
       } else {
         // If no selectedRecord, create a new appointment
         response = await createAppointment(formattedValues);
       }
-      console.log("response.status: ", response.status);
       if (response.status === 200) {
         Message("success", response.message, 2);
         form.resetFields();
