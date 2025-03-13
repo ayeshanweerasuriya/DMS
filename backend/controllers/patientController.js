@@ -14,9 +14,15 @@ const illnessTypes = [
     "Other",
   ];
 
+  const severityOptions = [
+    { label: 'Mild', value: 'Mild' },
+    { label: 'Moderate', value: 'Moderate' },
+    { label: 'Severe', value: 'Severe' }
+];
+
 const addPatient = async (req, res) => {
     try {
-        const { name, age, illnessType, contactNumber, dateOfBirth, notes } = req.body;
+        const { name, age, illnessType, contactNumber, dateOfBirth, notes, severityLevel } = req.body;
 
         // Validate required fields
         if (!name || !age || !illnessType || !contactNumber || !dateOfBirth) {
@@ -53,6 +59,11 @@ const addPatient = async (req, res) => {
             return res.status(400).json({ message: "Date of birth cannot be today or a future date.", status: 400 });
         }
 
+        // Validate severity level
+        if (severityLevel && !severityOptions.map((option) => option.value).includes(severityLevel)) {
+            return res.status(400).json({ message: "Invalid severity level. Please select a valid option.", status: 400 });
+        }
+
         // Validate notes length
         if (notes && notes.length > 2500) {
             return res.status(400).json({ message: "Patient notes must be at most 2500 characters.", status: 400 });
@@ -66,6 +77,7 @@ const addPatient = async (req, res) => {
             contactNumber,
             dateOfBirth,
             notes,
+            severityLevel
         });
 
         await newPatient.save();
