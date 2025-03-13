@@ -75,13 +75,18 @@ export function AppointmentForm({
     return {}; // For future dates, allow all times
   };
 
+  const handleDateChange = (date, dateString) => {
+    setSelectedDate(date);
+};
   const onFinish = async (values) => {
-    // console.log("Original values: ", values);
-
-    // Format date to "YYYY-MM-DD"
-    const formattedDate = new Date(values.appointmentDate)
-      .toISOString()
-      .split("T")[0];
+    if (!selectedDate) {
+      return;
+  }
+  
+   // Format date to "YYYY-MM-DD"
+   // Ensure correct conversion
+   const formattedDate = selectedDate.toISOString(); // Convert to valid ISO format
+   createAppointment({ ...values, appointmentDate: formattedDate });
 
     // Format time to "HH:MM AM/PM"
     const timeObj = new Date(values.appointmentTime);
@@ -101,15 +106,12 @@ export function AppointmentForm({
     try {
       let response;
       if (selectedRecord) {
-        console.log("formattedValues: ", formattedValues);
-        console.log("selectedRecord._id: ", selectedRecord._id);
         // If selectedRecord exists, call the updateAppointment function
         response = await updateAppointment(selectedRecord._id, formattedValues);
       } else {
         // If no selectedRecord, create a new appointment
         response = await createAppointment(formattedValues);
       }
-      console.log("response.status: ", response.status);
       if (response.status === 200) {
         Message("success", response.message, 2);
         form.resetFields();
@@ -158,7 +160,7 @@ export function AppointmentForm({
                 size="large"
                 style={{ width: "100%" }}
                 disabledDate={disabledDate}
-                onChange={(date) => setSelectedDate(date)}
+                onChange={handleDateChange}
               />
             </Form.Item>
           </Col>
