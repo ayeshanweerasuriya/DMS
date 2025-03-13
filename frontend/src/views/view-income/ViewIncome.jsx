@@ -12,13 +12,17 @@ import {
   message,
 } from "antd";
 import { TableComponent } from "../../components/table/TableComponent";
-import { getIncomeStatistics, updateHospitalFee } from "../../apiService";
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { InvoicePDF } from './InvoicePDF';
+import { PDFInvoice } from "../../components/pdf/PDFRenderer";
+import {
+  getIncomeStatistics,
+  updateHospitalFee,
+  getHospitalFee,
+} from "../../apiService";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 export function ViewIncome() {
   const { Title } = Typography;
-  const [hospitalCharge, setHospitalCharge] = useState(1200);
+  const [hospitalCharge, setHospitalCharge] = useState(0);
   const [incomeStatistics, setIncomeStatistics] = useState({});
   const [eachPatientFee, setEachPatientFee] = useState([]);
   const [refetchData, setRefetchData] = useState(false);
@@ -32,27 +36,34 @@ export function ViewIncome() {
           totalIncome: response.data.totalIncome,
         });
         setEachPatientFee(response.data.eachPatientFee);
-        setHospitalCharge(response.data.eachPatientFee[0].hospitalFee);
       })
       .catch((error) => {
         console.error("error: ", error);
       });
-      setRefetchData(false);
+    getHospitalFee()
+      .then((response) => {
+        console.log("response: ", response);
+        setHospitalCharge(response.hospitalFee);
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+      });
+    setRefetchData(false);
   }, [refetchData]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      updateHospitalFee({ "newHospitalFee": hospitalCharge });
-      message.success("Hospital Charge saved successfully!");
-      console.log("Saved hospital charge:", hospitalCharge);
+      const response = await updateHospitalFee({
+        newHospitalFee: hospitalCharge,
+      });
+      message.success(response.message);
+      console.log("response: ", response);
       setRefetchData(true);
     } catch (error) {
       console.error("error: ", error);
       message.error("Failed to save hospital charge");
     }
   };
-
-  console.log("eachPatientFee: ", eachPatientFee);
 
   const columns = [
     {
@@ -95,15 +106,25 @@ export function ViewIncome() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <PDFDownloadLink 
-          document={<InvoicePDF record={record} />} 
+        <PDFDownloadLink
+          document={<PDFInvoice record={record} />}
           fileName={`Invoice-${record.name}.pdf`}
         >
-          {({ loading }) => (loading ? 'Loading document...' : 'Download Invoice')}
+          <Button type="primary">{"Download Invoice"}</Button>
         </PDFDownloadLink>
       ),
-    }
+    },
   ];
+
+  const isEndOfMonth = () => {
+    const today = new Date();
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    );
+    return today.getDate() === lastDayOfMonth.getDate();
+  };
 
   return (
     <Flex vertical style={{}}>
@@ -177,6 +198,7 @@ export function ViewIncome() {
                 <InputNumber
                   min={0}
                   value={hospitalCharge}
+                  disabled={!isEndOfMonth()}
                   onChange={setHospitalCharge}
                   style={{
                     width: "300px",
@@ -188,10 +210,17 @@ export function ViewIncome() {
                   type="primary"
                   onClick={handleSave}
                   style={{ marginLeft: "8px" }}
+                  disabled={!isEndOfMonth()}
                 >
                   Save
                 </Button>
               </div>
+              {!isEndOfMonth() && (
+                  <div style={{ color: "red", marginTop: "8px" }}>
+                    *Hospital Charge can only be updated on the last day of the
+                    month.
+                  </div>
+                )}
             </div>
           </Card>
         </Col>
