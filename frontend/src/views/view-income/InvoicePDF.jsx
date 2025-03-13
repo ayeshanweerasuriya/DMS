@@ -145,7 +145,10 @@ export function InvoicePDF({ record }) {
 
         {/* Patient and Doctor Info */}
         <View style={styles.twoColumn}>
-          
+        <View>
+  <Text style={styles.sectionTitle}>BILL TO:</Text>
+  <Text style={styles.content}>{record.name}</Text>
+  </View>
           
           <View>
             <Text style={styles.sectionTitle}>ATTENDING DENTIST:</Text>
@@ -170,8 +173,9 @@ export function InvoicePDF({ record }) {
               <View style={styles.tableRow} key={index}>
                 <Text style={styles.tableCell}>{treatment.name}</Text>
                 <Text style={styles.tableCellAmount}>
-                  {/* {treatment.amount.toLocaleString('en-US')} */}
-                </Text>
+  {treatment.amount ? treatment.amount.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'}
+</Text>
+
               </View>
             ))}
           </View>
