@@ -37,8 +37,10 @@ export function ViewRecords() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
@@ -47,12 +49,14 @@ export function ViewRecords() {
       .catch((error) => {
         console.error("error: ", error);
       });
+    setLoading(false);
   }, [searchQuery, filter]);
 
   console.log("selectedPatient: ", selectedPatient);
   console.log("treatment: ", treatment);
 
   useEffect(() => {
+    setLoading(true);
     if (selectedPatient?._id) {
       setIsLoading(true);
       getTreatment(selectedPatient._id)
@@ -65,6 +69,7 @@ export function ViewRecords() {
           setIsLoading(false);
         });
     }
+    setLoading(false);
   }, [selectedPatient]);
 
   const handleSearch = (event) => {
@@ -205,7 +210,7 @@ export function ViewRecords() {
             </Tooltip>
           </Col>
         </Row>
-        <TableComponent columns={columns} data={data || []} />
+        <TableComponent columns={columns} data={data || []} loading={loading} />
       </Space>
       <Drawer
         title="Patient Details"

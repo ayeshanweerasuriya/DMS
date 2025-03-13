@@ -25,6 +25,7 @@ export function ApproveAppointmentForm({
   closeDrawer,
   onDelete,
   setRefetchData,
+  setLoading,
 }) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -44,6 +45,7 @@ export function ApproveAppointmentForm({
   }, [selectedRecord, form]);
 
   const onFinish = async (values) => {
+    setLoading(true);
     try {
       const formattedValues = {
         ...values,
@@ -73,6 +75,8 @@ export function ApproveAppointmentForm({
     } catch (error) {
       console.error("Failed to remove the appointment from the list: ", error);
       Message("error", "Failed to remove the appointment from the list", 3);
+    } finally {
+      setLoading(false);
     }
   };
 

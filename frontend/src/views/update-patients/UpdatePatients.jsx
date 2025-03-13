@@ -19,7 +19,7 @@ import {
 import { PhoneOutlined, PlusOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 // import { useNavigate } from "react-router-dom";
-import { getPatientList } from "../../apiService";
+import { getHospitalFee, getPatientList } from "../../apiService";
 import { TableComponent } from "../../components/table/TableComponent";
 import { EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -42,8 +42,11 @@ export function UpdatePatients() {
   const [refetch, setRefetch]=useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("0");
+  const [hospitalFee, setHospitalFee] = useState(undefined);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
@@ -52,6 +55,15 @@ export function UpdatePatients() {
       .catch((error) => {
         console.error("error: ", error);
       });
+    getHospitalFee()
+      .then((response) => {
+        console.log("response: ", response);
+        setHospitalFee(response.hospitalFee);
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+      });
+    setLoading(false);
   }, [searchQuery, filter]);
 
   const handleSearch = (event) => {
@@ -137,7 +149,7 @@ export function UpdatePatients() {
           </Col>
         </Row>
         <VerticalSpace height={"20px"} />
-        <TableComponent columns={columns} data={data || []} />
+        <TableComponent columns={columns} data={data || []} loading={loading} />
         {/* <Button onClick={showDrawer}></Button> */}
       </Typography>
       <Drawer
@@ -160,13 +172,13 @@ export function UpdatePatients() {
           </Space>
         }
         >
-      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose}/>
+      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose} hospitalFee={hospitalFee} setLoading={setLoading}/>
       </Drawer>
     </Flex>
   );
 }
 
-export function UpdatePatientsForm({ data,setRefetch,onClose }){
+export function UpdatePatientsForm({ data, setRefetch, onClose, hospitalFee, setLoading }){
   const navigate = useNavigate();
   const [form] = Form.useForm();
   
@@ -183,7 +195,7 @@ useEffect(() => {
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
-      hospitalFee: data.hospitalFee || "",
+      hospitalFee: hospitalFee || "",
     });
   }
 }, [data, form]);
@@ -203,6 +215,7 @@ useEffect(() => {
     };
   
     const onFinish = async (values) => {
+    setLoading(true);
     try {
       const formattedValues = {
         ...values,
@@ -222,6 +235,8 @@ useEffect(() => {
     } catch (error) {
       console.error("Error updating patient:", error);
       Message("error", "Failed to save patient", 3);
+    } finally {
+      setLoading(false);
     }
   };
 

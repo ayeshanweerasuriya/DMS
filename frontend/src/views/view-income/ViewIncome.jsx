@@ -26,8 +26,10 @@ export function ViewIncome() {
   const [incomeStatistics, setIncomeStatistics] = useState({});
   const [eachPatientFee, setEachPatientFee] = useState([]);
   const [refetchData, setRefetchData] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     getIncomeStatistics()
       .then((response) => {
         console.log("response: ", response);
@@ -49,9 +51,11 @@ export function ViewIncome() {
         console.error("error: ", error);
       });
     setRefetchData(false);
+    setLoading(false);
   }, [refetchData]);
 
   const handleSave = async () => {
+    setLoading(true);
     try {
       const response = await updateHospitalFee({
         newHospitalFee: hospitalCharge,
@@ -62,6 +66,8 @@ export function ViewIncome() {
     } catch (error) {
       console.error("error: ", error);
       message.error("Failed to save hospital charge");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -134,7 +140,7 @@ export function ViewIncome() {
       </Typography>
       <Row gutter={24}>
         <Col span={16}>
-          <TableComponent columns={columns} data={eachPatientFee} />
+          <TableComponent columns={columns} data={eachPatientFee} loading={loading}/>
         </Col>
         <Col span={5}>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
