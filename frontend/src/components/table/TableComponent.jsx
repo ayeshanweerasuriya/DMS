@@ -1,7 +1,7 @@
 import { Table, ConfigProvider } from "antd";
 import PropTypes from "prop-types";
 
-export function TableComponent({ columns = [], data = [], i = 0 }) {
+export function TableComponent({ columns = [], data = [], i = 0, loading = true }) {
   return (
     <ConfigProvider
       theme={{
@@ -19,7 +19,7 @@ export function TableComponent({ columns = [], data = [], i = 0 }) {
         },
       }}
     >
-      <Table columns={columns} dataSource={data} rowKey={(record) => record._id || i++}/>
+      <Table columns={columns} dataSource={data} rowKey={(record) => record._id || i++} loading={loading}/>
     </ConfigProvider>
   );
 }
