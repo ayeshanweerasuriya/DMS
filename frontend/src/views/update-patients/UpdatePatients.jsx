@@ -64,7 +64,8 @@ export function UpdatePatients() {
         console.error("error: ", error);
       });
     setLoading(false);
-  }, [searchQuery, filter]);
+    setRefetch(false);
+  }, [searchQuery, filter, refetch]);
 
   const handleSearch = (event) => {
     const value = event.target.value;
