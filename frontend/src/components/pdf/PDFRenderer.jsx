@@ -155,14 +155,6 @@ export function PDFInvoice({ record }) {
 
         {/* Patient and Doctor Info */}
         <View style={styles.twoColumn}>
-<<<<<<< HEAD:frontend/src/views/view-income/InvoicePDF.jsx
-        <View>
-  <Text style={styles.sectionTitle}>BILL TO:</Text>
-  <Text style={styles.content}>{record.name}</Text>
-  </View>
-          
-=======
->>>>>>> development:frontend/src/components/pdf/PDFRenderer.jsx
           <View>
             <Text style={styles.sectionTitle}>ATTENDING DENTIST:</Text>
             <Text style={styles.content}>Dr. Melani Rifai, MDS</Text>
@@ -185,16 +177,8 @@ export function PDFInvoice({ record }) {
             {treatments.map((treatment, index) => (
             <View style={styles.tableRow} key={index}>
                 <Text style={styles.tableCell}>{treatment.name}</Text>
-<<<<<<< HEAD:frontend/src/views/view-income/InvoicePDF.jsx
-                <Text style={styles.tableCellAmount}>
-  {treatment.amount ? treatment.amount.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'}
-</Text>
-
-              </View>
-=======
                 <Text style={styles.tableCellAmount}>{treatment.amount.toString()}</Text>  {/* Ensure it's a string */}
             </View>
->>>>>>> development:frontend/src/components/pdf/PDFRenderer.jsx
             ))}
           </View>
         </View>

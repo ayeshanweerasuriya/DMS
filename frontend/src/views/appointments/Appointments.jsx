@@ -146,21 +146,21 @@ export function Appointments() {
         const menuItems = [
           {
             key: "edit",
-            label: "Edit Appointment",
+            label: "Edit",
             icon: <EditOutlined />,
             onClick: () => onEdit(record),
           },
 
           {
             key: "approve",
-            label: "Approve Appointment",
+            label: "Approve",
             icon: <CheckOutlined style={{ color: "green" }} />,
             onClick: () => onApprove(record),
           },
 
           {
             key: "delete",
-            label: "Delete Appointment",
+            label: "Delete",
             icon: <DeleteFilled style={{ color: "red" }} />,
             onClick: () => showDeleteModal(record),
           },
