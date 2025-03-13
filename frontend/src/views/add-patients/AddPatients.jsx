@@ -11,7 +11,8 @@ import {
   Col,
   Button,
   Space,
-  Select
+  Select,
+  Radio 
 } from "antd";
 import { PhoneOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { createPatient } from "../../apiService";
 import moment from "moment";
 import { NotificationAlert } from "../../components/notification-alert/NotificationAlert";
+import { illnessOptions, severityOptions } from "../constants/options";
 
 const { Option } = Select;
 
@@ -52,20 +54,6 @@ export function AddPatientsForm({handleRedirect}) {
   const navigateToUpdateRecords = () => {
       navigate("/update-patients");
   };
-
-  const illnessOptions = [
-    { key: "1", label: "Cavities" },
-    { key: "2", label: "Gingivitis" },
-    { key: "3", label: "Periodontitis" },
-    { key: "4", label: "Tooth Decay" },
-    { key: "5", label: "Oral Cancer" },
-    { key: "6", label: "Bruxism" },
-    { key: "7", label: "Impacted Teeth" },
-    { key: "8", label: "Tooth Sensitivity" },
-    { key: "9", label: "Halitosis" },
-    { key: "10", label: "TMJ Disorders" },
-    { key: "11", label: "Other" },
-  ];
 
   return (
     <Form
@@ -144,6 +132,19 @@ export function AddPatientsForm({handleRedirect}) {
               style={{ width: "100%" }}
               disabledDate={(current) => current && current >= moment().endOf("day")}
             />
+          </Form.Item>
+          <Form.Item
+            label="Severity Level"
+            name="severityLevel"
+            rules={[{ required: true, message: "Please select a severity level" }]}
+            >
+          <Radio.Group
+            block
+            options={severityOptions}
+            defaultValue="Mild"
+            optionType="button"
+            buttonStyle="solid"
+          />
           </Form.Item>
         </Col>
         <Col span={12}>

@@ -37,6 +37,11 @@ const patientSchema = new mongoose.Schema({
     treatmentFee: { type: Number, maxlength: 2500, min: 0 },
     medicationFee: { type: Number, maxlength: 2500, min: 0 },
     hospitalFee: { type: Number, maxlength: 2500, min: 0 },
+    severityLevel: { 
+        type: String,
+        enum: ["Mild", "Moderate", "Severe"],
+        default: "Mild"
+    },
     notes: { type: String, maxlength: 2500 },
     createdAt: { type: Date, default: Date.now }
 });

@@ -12,7 +12,9 @@ import {
   Button,
   Space,
   Drawer,
-  Select
+  Select,
+  Radio,
+  Tag
 } from "antd";
 import { PhoneOutlined, PlusOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
@@ -26,6 +28,7 @@ import { updatePatient } from "../../apiService";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
 import VerticalSpace from "../../components/vertical-space";
+import { illnessOptions, severityOptions, severityColors } from "../constants/options";
 
 const { Search } = Input;
 const { Title } = Typography;
@@ -72,10 +75,17 @@ export function UpdatePatients() {
       dataIndex: "contactNumber",
     },
     {
-      title: "Date of Birth",
-      dataIndex: "dateOfBirth",
-      render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.dateOfBirth) - new Date(b.dateOfBirth),
+      title: "Illness Type",
+      dataIndex: "illnessType",
+      sorter: (a, b) => a.illnessType.localeCompare(b.illnessType),
+    },
+    {
+      title: "Severity Level",
+      dataIndex: "severityLevel",
+      sorter: (a, b) => a.severityLevel.localeCompare(b.severityLevel),
+      render: (severity) => (
+        <Tag color={severityColors[severity] || "#108ee9"}>{severity}</Tag>
+      )
     },
     {
       title: "Created At",
@@ -93,7 +103,7 @@ export function UpdatePatients() {
           onClick={() => showDrawer(record)}
         />
       ),
-    },
+    }
   ];
 
   const showDrawer = (record) => {
@@ -122,20 +132,7 @@ export function UpdatePatients() {
               label="Sort By Illness"
               defaultOption="All"
               onItemSelect={(item) => setFilter(item.key)}
-              items={[
-                { key: "0", label: "All" },
-                { key: "1", label: "Cavities" },
-                { key: "2", label: "Gingivitis" },
-                { key: "3", label: "Periodontitis" },
-                { key: "4", label: "Tooth Decay" },
-                { key: "5", label: "Oral Cancer" },
-                { key: "6", label: "Bruxism" },
-                { key: "7", label: "Impacted Teeth" },
-                { key: "8", label: "Tooth Sensitivity" },
-                { key: "9", label: "Halitosis" },
-                { key: "10", label: "TMJ Disorders" },
-                { key: "11", label: "Other" },
-              ]}
+              items={illnessOptions}
             />
           </Col>
         </Row>
@@ -182,6 +179,7 @@ useEffect(() => {
       illnessType: data.illnessType || "",
       contactNumber: data.contactNumber || "",
       dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      severityLevel: data.severityLevel || "Mild",
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
@@ -197,6 +195,7 @@ useEffect(() => {
       illnessType: data.illnessType || "",
       contactNumber: data.contactNumber || "",
       dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      severityLevel: data.severityLevel || "Mild",
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
@@ -225,20 +224,6 @@ useEffect(() => {
       Message("error", "Failed to save patient", 3);
     }
   };
-
-  const illnessOptions = [
-    { key: "1", label: "Cavities" },
-    { key: "2", label: "Gingivitis" },
-    { key: "3", label: "Periodontitis" },
-    { key: "4", label: "Tooth Decay" },
-    { key: "5", label: "Oral Cancer" },
-    { key: "6", label: "Bruxism" },
-    { key: "7", label: "Impacted Teeth" },
-    { key: "8", label: "Tooth Sensitivity" },
-    { key: "9", label: "Halitosis" },
-    { key: "10", label: "TMJ Disorders" },
-    { key: "11", label: "Other" },
-  ];
 
   return (
     <Form
@@ -323,6 +308,20 @@ useEffect(() => {
               disabledDate={(current) =>
                 current && current >= moment().endOf("day")
               }
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Severity Level"
+            name="severityLevel"
+            rules={[{ required: true, message: "Please select a severity level" }]}
+            >
+            <Radio.Group
+              block
+              options={severityOptions}
+              defaultValue="Mild"
+              optionType="button"
+              buttonStyle="solid"
             />
           </Form.Item>
 

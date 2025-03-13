@@ -18,7 +18,7 @@ import {
   EditOutlined,
   ReloadOutlined,
   CheckOutlined,
-  EllipsisOutlined,
+  MoreOutlined,
   DeleteFilled,
 } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
@@ -116,8 +116,9 @@ export function Appointments() {
       title: "Date",
       dataIndex: "appointmentDate",
       render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate),
-    },    
+      sorter: (a, b) =>
+        new Date(a.appointmentDate) - new Date(b.appointmentDate),
+    },
     {
       title: "Time",
       dataIndex: "appointmentTime",
@@ -142,39 +143,32 @@ export function Appointments() {
       title: "Actions",
       dataIndex: "actions",
       render: (_, record) => {
-        // Define the menu items
-        const menu = (
-          <Menu>
-            <Menu.Item
-              key="edit"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(record)} // Edit action
-            >
-              Edit
-            </Menu.Item>
-            <Menu.Item
-              key="approve"
-              icon={<CheckOutlined style={{ color: "green" }} />}
-              onClick={() => onApprove(record)}
-            >
-              Approve
-            </Menu.Item>
-            <Menu.Item
-              key="delete"
-              icon={<DeleteFilled style={{ color: "red" }} />}
-              onClick={() => showDeleteModal(record)}
-            >
-              Delete
-            </Menu.Item>
-          </Menu>
-        );
+        const menuItems = [
+          {
+            key: "edit",
+            label: "Edit Appointment",
+            icon: <EditOutlined />,
+            onClick: () => onEdit(record),
+          },
+
+          {
+            key: "approve",
+            label: "Approve Appointment",
+            icon: <CheckOutlined style={{ color: "green" }} />,
+            onClick: () => onApprove(record),
+          },
+
+          {
+            key: "delete",
+            label: "Delete Appointment",
+            icon: <DeleteFilled style={{ color: "red" }} />,
+            onClick: () => showDeleteModal(record),
+          },
+        ];
 
         return (
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <Button
-              type="link"
-              icon={<EllipsisOutlined />} // Kebab menu icon
-            />
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
+            <Button type="link" icon={<MoreOutlined />} />
           </Dropdown>
         );
       },
