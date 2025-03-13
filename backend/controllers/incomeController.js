@@ -1,4 +1,5 @@
 const Patient = require("../models/dental/Patient.js");
+const FeeConfig = require("../models/dental/FeeConfig.js");
 
 const getIncomeStats = async (req, res) => {
   try {
@@ -101,6 +102,18 @@ const updateHospitalFee = async (req, res) => {
       });
     }
 
+    const feeConfig = await FeeConfig.findOne();
+
+    if (!feeConfig) {
+      return res.status(404).json({
+        message: "Fee configuration not found. Please set up fee configuration first.",
+      });
+    }
+
+    feeConfig.hospitalFee = newHospitalFee;
+    feeConfig.updatedAt = new Date();
+    await feeConfig.save();
+
     const result = await Patient.updateMany(
       {},
       { $set: { hospitalFee: newHospitalFee } }
@@ -124,4 +137,26 @@ const updateHospitalFee = async (req, res) => {
   }
 };
 
-module.exports = { getIncomeStats, updateHospitalFee };
+const getHospitalFee = async (req, res) => {
+  try {
+    const feeConfig = await FeeConfig.findOne();
+
+    if (!feeConfig) {
+      return res.status(404).json({
+        message: "Fee configuration not found. Please set up fee configuration first.",
+      });
+    }
+
+    return res.status(200).json({
+      hospitalFee: feeConfig.hospitalFee,
+      updatedAt: feeConfig.updatedAt,
+    });
+  } catch (error) {
+    console.error("Error fetching hospital fee:", error);
+    return res.status(500).json({
+      message: "An error occurred while fetching hospital fees.",
+    });
+  }
+}
+
+module.exports = { getIncomeStats, updateHospitalFee, getHospitalFee };

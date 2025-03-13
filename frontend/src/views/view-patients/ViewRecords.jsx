@@ -16,12 +16,14 @@ import {
   Dropdown
 } from "antd";
 import { PlusOutlined, EyeOutlined, DownloadOutlined, MoreOutlined } from "@ant-design/icons";
-import { TableComponent } from "../../components/table/TableComponent";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useNavigate } from "react-router-dom";
 import { getPatientList, getTreatment } from "../../apiService";
+import { illnessOptions, severityColors } from "../constants/options";
+import { TableComponent } from "../../components/table/TableComponent";
+import { PDFInvoice } from "../../components/pdf/PDFRenderer";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
 import "./ViewRecords.css";
-import { illnessOptions, severityColors } from "../constants/options";
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -133,9 +135,33 @@ export function ViewRecords() {
           },
           {
             key: "download",
-            label: "Download Invoice",
-            icon: <DownloadOutlined />,
-          },
+            label: (
+              <Tooltip
+                placement="left"
+                title={
+                  (!record.treatmentFee || !record.medicationFee)
+                    ? "Since this patient record is not completed by adding Medication Fee and Treatment Fee, you cannot download the invoice."
+                    : ""
+                }
+              >
+                <span>
+                  <PDFDownloadLink
+                    document={<PDFInvoice record={record} />}
+                    fileName={`Invoice-${record.name}.pdf`}
+                    style={{ pointerEvents: (!record.treatmentFee || !record.medicationFee) ? "none" : "auto" }} // Prevents click
+                  >
+                    {({ loading }) => (
+                      <span>
+                        <DownloadOutlined style={{ marginRight: 8 }} />
+                        {loading ? "Loading document..." : "Download Invoice"}
+                      </span>
+                    )}
+                  </PDFDownloadLink>
+                </span>
+              </Tooltip>
+            ),
+            disabled: !record.treatmentFee || !record.medicationFee,
+          }       
         ];
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
@@ -214,7 +240,6 @@ export function DetailedView({ selectedPatient }) {
       bordered
       size="middle"
       labelStyle={{ fontWeight: "bold" }}
-      labelBg
     >
       <Descriptions.Item label="Name">
         {selectedPatient.name || "N/A"}

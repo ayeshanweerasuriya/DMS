@@ -16,6 +16,7 @@ import moment from "moment";
 import { deleteAppointment, createPatient } from "../../apiService";
 import { Message } from "../../components/message/Message";
 import { useNavigate } from "react-router-dom";
+import { illnessOptions } from "../constants/options";
 
 const { Option } = Select;
 
@@ -74,20 +75,6 @@ export function ApproveAppointmentForm({
       Message("error", "Failed to remove the appointment from the list", 3);
     }
   };
-
-  const illnessOptions = [
-    { key: "1", label: "Cavities" },
-    { key: "2", label: "Gingivitis" },
-    { key: "3", label: "Periodontitis" },
-    { key: "4", label: "Tooth Decay" },
-    { key: "5", label: "Oral Cancer" },
-    { key: "6", label: "Bruxism" },
-    { key: "7", label: "Impacted Teeth" },
-    { key: "8", label: "Tooth Sensitivity" },
-    { key: "9", label: "Halitosis" },
-    { key: "10", label: "TMJ Disorders" },
-    { key: "11", label: "Other" },
-  ];
 
   return (
     <Form
