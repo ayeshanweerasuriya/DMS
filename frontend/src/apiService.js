@@ -160,9 +160,18 @@ export const getIncomeStatistics = async () => {
   }
 };
 
+export const getHospitalFee = async () => {
+  try {
+    const response = await api.get(`/api/income/hospital-fee`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
 export const updateHospitalFee = async (data) => {
   try {
-    const response = await api.patch(`/api/income/`, data);
+    const response = await api.patch(`/api/income/hospital-fee`, data);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : "An error occurred";

@@ -147,7 +147,7 @@ export function Sidebar({ collapsed, logOut }) {
       key: "/view-records",
       icon: <FolderViewOutlined />,
       label: <Link to="/view-records">Patient Records</Link>,
-      allowedRoles: ["Doctor", "Admin"],
+      allowedRoles: ["Doctor", "Admin", "Staff"],
     },
     {
       key: "/add-patients",
@@ -319,7 +319,7 @@ function App() {
                 <Route
                   path="/view-records"
                   element={
-                    <ProtectedRoute allowedRoles={["Doctor", "Admin"]}>
+                    <ProtectedRoute allowedRoles={["Doctor", "Admin", "Staff"]}>
                       <ViewRecords />
                     </ProtectedRoute>
                   }
