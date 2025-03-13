@@ -145,13 +145,7 @@ export function InvoicePDF({ record }) {
 
         {/* Patient and Doctor Info */}
         <View style={styles.twoColumn}>
-          <View>
-            <Text style={styles.sectionTitle}>BILL TO:</Text>
-            <Text style={styles.content}>{record.name}</Text>
-            <Text style={styles.content}>123 Patient Lane</Text>
-            <Text style={styles.content}>Colombo - 400001</Text>
-            <Text style={styles.content}>Phone: +94 77765 43210</Text>
-          </View>
+          
           
           <View>
             <Text style={styles.sectionTitle}>ATTENDING DENTIST:</Text>
