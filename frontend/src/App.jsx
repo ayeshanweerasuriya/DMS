@@ -144,16 +144,16 @@ export function Sidebar({ collapsed, logOut }) {
       allowedRoles: ["Staff", "Admin"],
     },
     {
-      key: "/view-records",
-      icon: <FolderViewOutlined />,
-      label: <Link to="/view-records">Patient Records</Link>,
-      allowedRoles: ["Doctor", "Admin", "Staff"],
-    },
-    {
       key: "/add-patients",
       icon: <UserAddOutlined />,
       label: <Link to="/add-patients">Add Patients</Link>,
       allowedRoles: ["Staff", "Admin"],
+    },
+    {
+      key: "/view-records",
+      icon: <FolderViewOutlined />,
+      label: <Link to="/view-records">Patient Records</Link>,
+      allowedRoles: ["Doctor", "Admin", "Staff"],
     },
     {
       key: "/update-patients",
