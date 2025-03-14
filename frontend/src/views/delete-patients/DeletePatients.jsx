@@ -5,6 +5,7 @@ import { DeleteFilled } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 import { getPatientList, deletePatient } from "../../apiService";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
+import { illnessOptions } from "../constants/options";
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -15,8 +16,10 @@ export function DeletePatients() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("0");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
@@ -25,6 +28,7 @@ export function DeletePatients() {
       .catch((error) => {
         console.error("error: ", error);
       });
+    setLoading(false);
   }, [searchQuery, filter]);
 
   const handleSearch = (event) => {
@@ -38,6 +42,7 @@ export function DeletePatients() {
   };
 
   const handleDeleteConfirm = async () => {
+    setLoading(true);
     if (selectedPatient) {
       deletePatient(selectedPatient._id)
         .then((response) => {
@@ -52,6 +57,7 @@ export function DeletePatients() {
     }
     setIsModalVisible(false);
     setSelectedPatient(null);
+    setLoading(false);
   };
 
   const handleCancel = () => {
@@ -120,24 +126,11 @@ export function DeletePatients() {
               label="Sort By Illness"
               defaultOption="All"
               onItemSelect={(item) => setFilter(item.key)}
-              items={[
-                { key: "0", label: "All" },
-                { key: "1", label: "Cavities" },
-                { key: "2", label: "Gingivitis" },
-                { key: "3", label: "Periodontitis" },
-                { key: "4", label: "Tooth Decay" },
-                { key: "5", label: "Oral Cancer" },
-                { key: "6", label: "Bruxism" },
-                { key: "7", label: "Impacted Teeth" },
-                { key: "8", label: "Tooth Sensitivity" },
-                { key: "9", label: "Halitosis" },
-                { key: "10", label: "TMJ Disorders" },
-                { key: "11", label: "Other" },
-              ]}
+              items={illnessOptions}
             />
           </Col>
         </Row>
-        <TableComponent columns={columns} data={data} />
+        <TableComponent columns={columns} data={data} loading={loading}/>
       </Space>
       <Modal
         title="Confirm Deletion"

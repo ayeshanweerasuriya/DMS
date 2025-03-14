@@ -22,6 +22,7 @@ export function AppointmentForm({
   setRefetchData,
   selectedRecord = null,
   closeDrawer,
+  setLoading
 }) {
   const [form] = Form.useForm();
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
@@ -104,6 +105,7 @@ export function AppointmentForm({
     };
 
     try {
+      setLoading(true);
       let response;
       if (selectedRecord) {
         // If selectedRecord exists, call the updateAppointment function
@@ -123,6 +125,8 @@ export function AppointmentForm({
       }
     } catch (error) {
       console.error("Failed to save appointment:", error);
+    } finally {
+      setLoading(false);
     }
   };
 

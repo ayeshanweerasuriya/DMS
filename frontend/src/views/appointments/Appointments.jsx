@@ -41,10 +41,12 @@ export function Appointments() {
   const [isApproveVisible, setIsApproveVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   console.log("selectedDate: ", selectedDate);
 
   useEffect(() => {
+    setLoading(true);
     getAppointmentsList(searchQuery, selectedDate)
       .then((response) => {
         setData(response.appointments);
@@ -53,6 +55,7 @@ export function Appointments() {
         console.error("error: ", error);
       });
     setRefetchData(false);
+    setLoading(false);
   }, [searchQuery, refetchData, selectedDate]);
 
   const handleSearch = (event) => {
@@ -72,6 +75,7 @@ export function Appointments() {
   };
 
   const onDelete = async () => {
+    setLoading(true);
     try {
       const response = await deleteAppointment(selectedRecord._id);
       if (response.status === 200) {
@@ -82,6 +86,7 @@ export function Appointments() {
       console.error("Failed to delete appointment:", error);
     }
     setIsModalVisible(false);
+    setLoading(false);
   };
 
   const closeDrawer = () => {
@@ -217,7 +222,7 @@ export function Appointments() {
         </Col>
       </Row>
       <VerticalSpace height={"20px"} />
-      <TableComponent columns={columns} data={data} />
+      <TableComponent columns={columns} data={data} loading={loading} />
       <Modal
         title="Confirm Deletion"
         open={isModalVisible}
@@ -247,6 +252,7 @@ export function Appointments() {
               selectedRecord={selectedRecord}
               closeDrawer={closeDrawer}
               setRefetchData={setRefetchData}
+              setLoading={setLoading}
             />
           ) : (
             <AppointmentForm
@@ -254,6 +260,7 @@ export function Appointments() {
               selectedRecord={selectedRecord}
               closeDrawer={closeDrawer}
               onDelete={onDelete}
+              setLoading={setLoading}
             />
           ))}
       </Drawer>
