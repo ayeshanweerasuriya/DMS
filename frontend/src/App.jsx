@@ -23,6 +23,7 @@ import {
   DollarOutlined,
   FileOutlined,
   UserOutlined,
+  SettingOutlined,
   QuestionCircleOutlined
 } from "@ant-design/icons";
 import { LogIn } from "./views/auth/LogIn";
@@ -32,6 +33,7 @@ import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
 import { ViewIncome } from "./views/view-income/ViewIncome";
+import { Settings } from "./views/settings/Settings";
 import { NotFound } from "./views/not-found/NotFound";
 import { ProtectedRoute } from "./utils/ProtectedRoute";
 import { DateTime } from "luxon";
@@ -191,6 +193,12 @@ export function Sidebar({ collapsed, logOut }) {
       icon: <DollarOutlined />,
       label: <Link to="/view-income">View Income</Link>,
       allowedRoles: ["Doctor", "Admin"],
+    },
+    {
+      key: "/settings",
+      icon: <SettingOutlined />,
+      label: <Link to="/settings">Settings</Link>,
+      allowedRoles: ["Admin"],
     },
   ];
 
@@ -366,12 +374,19 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-
                 <Route
                   path="/view-income"
                   element={
                     <ProtectedRoute allowedRoles={["Doctor", "Admin"]}>
                       <ViewIncome />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute allowedRoles={["Admin"]}>
+                      <Settings />
                     </ProtectedRoute>
                   }
                 />

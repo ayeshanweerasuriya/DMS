@@ -140,17 +140,7 @@ export function ViewIncome() {
                 marginBottom: "16px",
               }}
             >
-              <InputNumber
-                value={incomeStatistics.todayIncome || 0}
-                readOnly
-                style={{
-                  width: "100%",
-                  textAlign: "center",
-                  fontSize: "24px",
-                  color: "#1677ff",
-                }}
-                formatter={(value) => `Rs. ${value}`}
-              />
+              <Title level={3}>{`Rs. ${incomeStatistics.todayIncome || 0}`}</Title>
             </Card>
 
             <Card
@@ -161,17 +151,7 @@ export function ViewIncome() {
                 borderRadius: "8px",
               }}
             >
-              <InputNumber
-                value={incomeStatistics.totalIncome || 0}
-                readOnly
-                style={{
-                  width: "100%",
-                  textAlign: "center",
-                  fontSize: "24px",
-                  color: "#1677ff",
-                }}
-                formatter={(value) => `Rs. ${value}`}
-              />
+              <Title level={3}>{`Rs. ${incomeStatistics.totalIncome || 0}`}</Title>
             </Card>
           </Space>
         </Col>

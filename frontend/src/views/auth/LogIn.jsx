@@ -27,6 +27,7 @@ export function LogIn() {
           } else {
             navigate("/appointments");
           }
+          window.location.reload(); 
         }, 2000);
       } else {
         Message("error", "Invalid username or password", 5);
@@ -39,11 +40,11 @@ export function LogIn() {
 
   return (
     <div className="login-component">
-<div className="logo-name">
-  <img src="/login/logo.png" alt="DentalEase Logo" className="logo-img" />
-  <h1 className="logo-title">DentalEase</h1>
-  <h2 className="logo-subtitle">Dental Management System</h2>
-</div>
+      <div className="logo-name">
+        <img src="/login/logo.png" alt="DentalEase Logo" className="logo-img" />
+        <h1 className="logo-title">DentalEase</h1>
+        <h2 className="logo-subtitle">Dental Management System</h2>
+      </div>
       <div className="login">
         <h3 className="form-heading">Choose your account type</h3>
         <div style={{ display: "flex", marginTop: "10px" }}>
@@ -58,7 +59,12 @@ export function LogIn() {
               color: "#fff",
             }}
           >
-            <img src="/login/staff.svg" height={"150px"} width={"125px"} alt="staff" />
+            <img
+              src="/login/staff.svg"
+              height={"150px"}
+              width={"125px"}
+              alt="staff"
+            />
             <p className="block-text">Staff</p>
           </div>
           <div className="or-container">
@@ -75,7 +81,12 @@ export function LogIn() {
               color: "#fff",
             }}
           >
-            <img src="/login/doctor.svg" height={"150px"} width={"125px"} alt="doctor" />
+            <img
+              src="/login/doctor.svg"
+              height={"150px"}
+              width={"125px"}
+              alt="doctor"
+            />
             <p className="block-text">Doctor</p>
           </div>
         </div>
