@@ -43,7 +43,6 @@ export function ViewRecords() {
     setLoading(true);
     getPatientList(searchQuery, filter)
       .then((response) => {
-        console.log("response: ", response);
         setData(response.patients);
       })
       .catch((error) => {
@@ -51,9 +50,6 @@ export function ViewRecords() {
       });
     setLoading(false);
   }, [searchQuery, filter]);
-
-  console.log("selectedPatient: ", selectedPatient);
-  console.log("treatment: ", treatment);
 
   useEffect(() => {
     setLoading(true);
@@ -82,7 +78,6 @@ export function ViewRecords() {
   };
 
   const handleView = (record) => {
-    console.log("Viewing record:", record);
     setSelectedPatient(record);
     setIsDrawerVisible(true);
   };
