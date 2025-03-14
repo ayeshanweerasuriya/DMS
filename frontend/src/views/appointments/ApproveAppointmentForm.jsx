@@ -132,11 +132,13 @@ export function ApproveAppointmentForm({
               style={{ width: "100%" }}
               onChange={(value) => setShowOtherField(value === "Other")}
             >
-              {illnessOptions.map((item) => (
-                <Select.Option key={item.key} value={item.label}>
-                  {item.label}
-                </Select.Option>
-              ))}
+              {illnessOptions
+                .filter((item) => item.label !== "All")
+                .map((item) => (
+                  <Select.Option key={item.key} value={item.label}>
+                    {item.label}
+                  </Select.Option>
+                ))}
             </Select>
           </Form.Item>
 
