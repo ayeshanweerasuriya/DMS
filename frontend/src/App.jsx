@@ -23,6 +23,7 @@ import {
   DollarOutlined,
   FileOutlined,
   UserOutlined,
+  QuestionCircleOutlined
 } from "@ant-design/icons";
 import { LogIn } from "./views/auth/LogIn";
 import { Appointments } from "./views/appointments/Appointments";
@@ -99,6 +100,20 @@ export function CustomHeader({ collapsed, setCollapsed }) {
 
       {user && (
         <Space>
+        <a 
+          href="https://drive.google.com/file/d/17czhLcaOVjM-w5ylXUxfw6caRnMuTpZD/view?usp=sharing" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          <QuestionCircleOutlined
+            style={{
+              fontSize: 20,
+              color: "#fff",
+              marginRight: "20px",
+              cursor: "pointer",
+            }}
+          />
+        </a>
           <Text
             strong
             style={{
@@ -129,23 +144,8 @@ export function CustomHeader({ collapsed, setCollapsed }) {
               fontSize: 20,
             }}
           />
-
-           {/* Floating Button */}
-      <FloatButton 
-        tooltip={<div>Documents</div>}
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          backgroundColor: "#1a75ff",
-        }}
-        icon={< FileOutlined />} // 
-  href="https://drive.google.com/file/d/17czhLcaOVjM-w5ylXUxfw6caRnMuTpZD/view?usp=sharing"
-  target="_blank" // This will open the link in a new tab
-      />
         </Space>
       )}
-
     </Header>
   );
 }
@@ -279,8 +279,7 @@ export function Sidebar({ collapsed, logOut }) {
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  const { Sider, Content } = Layout;
-  const location = useLocation();
+  const { Content } = Layout;
   const isAuthenticated = sessionStorage.getItem("token") !== null;
 
   const borderRadiusLG = "25px";
