@@ -12,12 +12,14 @@ import {
   Button,
   Space,
   Drawer,
-  Select
+  Select,
+  Radio,
+  Tag
 } from "antd";
 import { PhoneOutlined, PlusOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 // import { useNavigate } from "react-router-dom";
-import { getPatientList } from "../../apiService";
+import { getHospitalFee, getPatientList } from "../../apiService";
 import { TableComponent } from "../../components/table/TableComponent";
 import { EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -26,6 +28,7 @@ import { updatePatient } from "../../apiService";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
 import VerticalSpace from "../../components/vertical-space";
+import { illnessOptions, severityOptions, severityColors } from "../constants/options";
 
 const { Search } = Input;
 const { Title } = Typography;
@@ -39,8 +42,11 @@ export function UpdatePatients() {
   const [refetch, setRefetch]=useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("0");
+  const [hospitalFee, setHospitalFee] = useState(undefined);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
@@ -49,7 +55,17 @@ export function UpdatePatients() {
       .catch((error) => {
         console.error("error: ", error);
       });
-  }, [searchQuery, filter]);
+    getHospitalFee()
+      .then((response) => {
+        console.log("response: ", response);
+        setHospitalFee(response.hospitalFee);
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+      });
+    setLoading(false);
+    setRefetch(false);
+  }, [searchQuery, filter, refetch]);
 
   const handleSearch = (event) => {
     const value = event.target.value;
@@ -72,10 +88,17 @@ export function UpdatePatients() {
       dataIndex: "contactNumber",
     },
     {
-      title: "Date of Birth",
-      dataIndex: "dateOfBirth",
-      render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.dateOfBirth) - new Date(b.dateOfBirth),
+      title: "Illness Type",
+      dataIndex: "illnessType",
+      sorter: (a, b) => a.illnessType.localeCompare(b.illnessType),
+    },
+    {
+      title: "Severity Level",
+      dataIndex: "severityLevel",
+      sorter: (a, b) => a.severityLevel.localeCompare(b.severityLevel),
+      render: (severity) => (
+        <Tag color={severityColors[severity] || "#108ee9"}>{severity}</Tag>
+      )
     },
     {
       title: "Created At",
@@ -93,7 +116,7 @@ export function UpdatePatients() {
           onClick={() => showDrawer(record)}
         />
       ),
-    },
+    }
   ];
 
   const showDrawer = (record) => {
@@ -122,25 +145,12 @@ export function UpdatePatients() {
               label="Sort By Illness"
               defaultOption="All"
               onItemSelect={(item) => setFilter(item.key)}
-              items={[
-                { key: "0", label: "All" },
-                { key: "1", label: "Cavities" },
-                { key: "2", label: "Gingivitis" },
-                { key: "3", label: "Periodontitis" },
-                { key: "4", label: "Tooth Decay" },
-                { key: "5", label: "Oral Cancer" },
-                { key: "6", label: "Bruxism" },
-                { key: "7", label: "Impacted Teeth" },
-                { key: "8", label: "Tooth Sensitivity" },
-                { key: "9", label: "Halitosis" },
-                { key: "10", label: "TMJ Disorders" },
-                { key: "11", label: "Other" },
-              ]}
+              items={illnessOptions}
             />
           </Col>
         </Row>
         <VerticalSpace height={"20px"} />
-        <TableComponent columns={columns} data={data || []} />
+        <TableComponent columns={columns} data={data || []} loading={loading} />
         {/* <Button onClick={showDrawer}></Button> */}
       </Typography>
       <Drawer
@@ -163,13 +173,13 @@ export function UpdatePatients() {
           </Space>
         }
         >
-      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose}/>
+      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose} hospitalFee={hospitalFee} setLoading={setLoading}/>
       </Drawer>
     </Flex>
   );
 }
 
-export function UpdatePatientsForm({ data,setRefetch,onClose }){
+export function UpdatePatientsForm({ data, setRefetch, onClose, hospitalFee, setLoading }){
   const navigate = useNavigate();
   const [form] = Form.useForm();
   
@@ -182,10 +192,11 @@ useEffect(() => {
       illnessType: data.illnessType || "",
       contactNumber: data.contactNumber || "",
       dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      severityLevel: data.severityLevel || "Mild",
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
-      hospitalFee: data.hospitalFee || "",
+      hospitalFee: hospitalFee || "",
     });
   }
 }, [data, form]);
@@ -197,6 +208,7 @@ useEffect(() => {
       illnessType: data.illnessType || "",
       contactNumber: data.contactNumber || "",
       dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      severityLevel: data.severityLevel || "Mild",
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
@@ -204,6 +216,7 @@ useEffect(() => {
     };
   
     const onFinish = async (values) => {
+    setLoading(true);
     try {
       const formattedValues = {
         ...values,
@@ -223,22 +236,10 @@ useEffect(() => {
     } catch (error) {
       console.error("Error updating patient:", error);
       Message("error", "Failed to save patient", 3);
+    } finally {
+      setLoading(false);
     }
   };
-
-  const illnessOptions = [
-    { key: "1", label: "Cavities" },
-    { key: "2", label: "Gingivitis" },
-    { key: "3", label: "Periodontitis" },
-    { key: "4", label: "Tooth Decay" },
-    { key: "5", label: "Oral Cancer" },
-    { key: "6", label: "Bruxism" },
-    { key: "7", label: "Impacted Teeth" },
-    { key: "8", label: "Tooth Sensitivity" },
-    { key: "9", label: "Halitosis" },
-    { key: "10", label: "TMJ Disorders" },
-    { key: "11", label: "Other" },
-  ];
 
   return (
     <Form
@@ -323,6 +324,20 @@ useEffect(() => {
               disabledDate={(current) =>
                 current && current >= moment().endOf("day")
               }
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Severity Level"
+            name="severityLevel"
+            rules={[{ required: true, message: "Please select a severity level" }]}
+            >
+            <Radio.Group
+              block
+              options={severityOptions}
+              defaultValue="Mild"
+              optionType="button"
+              buttonStyle="solid"
             />
           </Form.Item>
 

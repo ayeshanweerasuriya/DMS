@@ -5,6 +5,7 @@ const authenticate = require("../../middleware/authenticate.js");
 const router = express.Router();
 
 router.get("/", authenticate, incomeController.getIncomeStats);
-router.patch("/", authenticate, incomeController.updateHospitalFee);
+router.get("/hospital-fee", authenticate, incomeController.getHospitalFee);
+router.patch("/hospital-fee", authenticate, incomeController.updateHospitalFee);
 
 module.exports = router;

@@ -38,13 +38,6 @@
   height: auto;
 }
 
-.block {
-  background-color: #aaccff;
-  padding: 20px 40px;
-  border-radius: 20px;
-  text-align: center;
-}
-
 .login-form {
   display: flex;
   flex-direction: column;
@@ -95,9 +88,15 @@
   color: #333;
 }
 
+.block {
+  background-color: #5f9bf5;
+  padding: 20px 40px;
+  border-radius: 20px;
+  text-align: center;
+}
+
 .block-text {
   font-family: "Poppins", sans-serif;
-  margin-top: 5px;
   font-size: 15px;
   font-weight: bold;
 }

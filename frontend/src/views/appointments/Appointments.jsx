@@ -18,7 +18,7 @@ import {
   EditOutlined,
   ReloadOutlined,
   CheckOutlined,
-  EllipsisOutlined,
+  MoreOutlined,
   DeleteFilled,
 } from "@ant-design/icons";
 import { TableComponent } from "../../components/table/TableComponent";
@@ -41,10 +41,12 @@ export function Appointments() {
   const [isApproveVisible, setIsApproveVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   console.log("selectedDate: ", selectedDate);
 
   useEffect(() => {
+    setLoading(true);
     getAppointmentsList(searchQuery, selectedDate)
       .then((response) => {
         setData(response.appointments);
@@ -53,6 +55,7 @@ export function Appointments() {
         console.error("error: ", error);
       });
     setRefetchData(false);
+    setLoading(false);
   }, [searchQuery, refetchData, selectedDate]);
 
   const handleSearch = (event) => {
@@ -72,6 +75,7 @@ export function Appointments() {
   };
 
   const onDelete = async () => {
+    setLoading(true);
     try {
       const response = await deleteAppointment(selectedRecord._id);
       if (response.status === 200) {
@@ -82,6 +86,7 @@ export function Appointments() {
       console.error("Failed to delete appointment:", error);
     }
     setIsModalVisible(false);
+    setLoading(false);
   };
 
   const closeDrawer = () => {
@@ -116,8 +121,9 @@ export function Appointments() {
       title: "Date",
       dataIndex: "appointmentDate",
       render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate),
-    },    
+      sorter: (a, b) =>
+        new Date(a.appointmentDate) - new Date(b.appointmentDate),
+    },
     {
       title: "Time",
       dataIndex: "appointmentTime",
@@ -142,39 +148,32 @@ export function Appointments() {
       title: "Actions",
       dataIndex: "actions",
       render: (_, record) => {
-        // Define the menu items
-        const menu = (
-          <Menu>
-            <Menu.Item
-              key="edit"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(record)} // Edit action
-            >
-              Edit
-            </Menu.Item>
-            <Menu.Item
-              key="approve"
-              icon={<CheckOutlined style={{ color: "green" }} />}
-              onClick={() => onApprove(record)}
-            >
-              Approve
-            </Menu.Item>
-            <Menu.Item
-              key="delete"
-              icon={<DeleteFilled style={{ color: "red" }} />}
-              onClick={() => showDeleteModal(record)}
-            >
-              Delete
-            </Menu.Item>
-          </Menu>
-        );
+        const menuItems = [
+          {
+            key: "edit",
+            label: "Edit",
+            icon: <EditOutlined />,
+            onClick: () => onEdit(record),
+          },
+
+          {
+            key: "approve",
+            label: "Approve",
+            icon: <CheckOutlined style={{ color: "green" }} />,
+            onClick: () => onApprove(record),
+          },
+
+          {
+            key: "delete",
+            label: "Delete",
+            icon: <DeleteFilled style={{ color: "red" }} />,
+            onClick: () => showDeleteModal(record),
+          },
+        ];
 
         return (
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <Button
-              type="link"
-              icon={<EllipsisOutlined />} // Kebab menu icon
-            />
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
+            <Button type="link" icon={<MoreOutlined />} />
           </Dropdown>
         );
       },
@@ -223,7 +222,7 @@ export function Appointments() {
         </Col>
       </Row>
       <VerticalSpace height={"20px"} />
-      <TableComponent columns={columns} data={data} />
+      <TableComponent columns={columns} data={data} loading={loading} />
       <Modal
         title="Confirm Deletion"
         open={isModalVisible}
@@ -253,6 +252,7 @@ export function Appointments() {
               selectedRecord={selectedRecord}
               closeDrawer={closeDrawer}
               setRefetchData={setRefetchData}
+              setLoading={setLoading}
             />
           ) : (
             <AppointmentForm
@@ -260,6 +260,7 @@ export function Appointments() {
               selectedRecord={selectedRecord}
               closeDrawer={closeDrawer}
               onDelete={onDelete}
+              setLoading={setLoading}
             />
           ))}
       </Drawer>
