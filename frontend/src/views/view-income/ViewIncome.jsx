@@ -139,10 +139,10 @@ export function ViewIncome() {
         <Divider />
       </Typography>
       <Row gutter={24}>
-        <Col span={16}>
+        <Col span={17}>
           <TableComponent columns={columns} data={eachPatientFee} loading={loading}/>
         </Col>
-        <Col span={8}>
+        <Col span={7}>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
             <Card
               title="Today Income"
