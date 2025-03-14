@@ -29,6 +29,7 @@ export function ApproveAppointmentForm({
 }) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [showOtherField, setShowOtherField] = useState(false);
 
   // Set initial values when selectedRecord changes
   useEffect(() => {
@@ -37,6 +38,7 @@ export function ApproveAppointmentForm({
         name: selectedRecord.patientName || "",
         age: selectedRecord.patientAge || null,
         illnessType: "",
+        otherIllness: "",
         contactNumber: selectedRecord.contactNumber || "",
         dateOfBirth: null,
         notes: "",
@@ -128,14 +130,25 @@ export function ApproveAppointmentForm({
               size="large"
               placeholder="Select an illness type"
               style={{ width: "100%" }}
+              onChange={(value) => setShowOtherField(value === "Other")}
             >
               {illnessOptions.map((item) => (
-                <Option key={item.key} value={item.label}>
+                <Select.Option key={item.key} value={item.label}>
                   {item.label}
-                </Option>
+                </Select.Option>
               ))}
             </Select>
           </Form.Item>
+
+          {showOtherField && (
+            <Form.Item
+              label="Specify Illness"
+              name="otherIllness"
+              rules={[{ required: true, message: "Please specify the illness" }]}
+            >
+              <Input size="large" placeholder="Enter illness name" />
+            </Form.Item>
+          )}
 
           <Form.Item
             label="Contact Number"

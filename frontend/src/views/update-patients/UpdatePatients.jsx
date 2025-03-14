@@ -44,6 +44,7 @@ export function UpdatePatients() {
   const [filter, setFilter] = useState("0");
   const [hospitalFee, setHospitalFee] = useState(undefined);
   const [loading, setLoading] = useState(true);
+  const [showOtherField, setShowOtherField] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -173,13 +174,13 @@ export function UpdatePatients() {
           </Space>
         }
         >
-      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose} hospitalFee={hospitalFee} setLoading={setLoading}/>
+      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose} hospitalFee={hospitalFee} showOtherField={showOtherField} setShowOtherField={setShowOtherField} setLoading={setLoading}/>
       </Drawer>
     </Flex>
   );
 }
 
-export function UpdatePatientsForm({ data, setRefetch, onClose, hospitalFee, setLoading }){
+export function UpdatePatientsForm({ data, setRefetch, onClose, hospitalFee, setLoading, showOtherField, setShowOtherField }) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   
@@ -190,6 +191,7 @@ useEffect(() => {
       name: data.name || "",
       age: data.age || null,
       illnessType: data.illnessType || "",
+      otherIllness: data.illnessType === "Other" ? data.otherIllness : "",
       contactNumber: data.contactNumber || "",
       dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
       severityLevel: data.severityLevel || "Mild",
@@ -198,22 +200,10 @@ useEffect(() => {
       medicationFee: data.medicationFee || "",
       hospitalFee: hospitalFee || "",
     });
-  }
-}, [data, form]);
 
-    // Set initial values
-    const initialValues = {
-      name: data.name || "",
-      age: data.age || null,
-      illnessType: data.illnessType || "",
-      contactNumber: data.contactNumber || "",
-      dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
-      severityLevel: data.severityLevel || "Mild",
-      notes: data.notes || "",
-      treatmentFee: data.treatmentFee || "",
-      medicationFee: data.medicationFee || "",
-      hospitalFee: data.hospitalFee || "",
-    };
+    setShowOtherField(data.illnessType === "Other");
+  }
+}, [data, form, hospitalFee, setShowOtherField]);
   
     const onFinish = async (values) => {
     setLoading(true);
@@ -240,6 +230,8 @@ useEffect(() => {
       setLoading(false);
     }
   };
+
+  console.log('showOtherField: ', showOtherField);
 
   return (
     <Form
@@ -282,15 +274,46 @@ useEffect(() => {
           <Form.Item
             label="Illness Type"
             name="illnessType"
-            rules={[{ required: true, message: "Please select an illness type" }]}
+            rules={[
+              { required: true, message: "Please select an illness type" },
+            ]}
           >
-            <Select size="large" placeholder="Select an illness type" style={{ width: "100%" }}>
+            <Select
+              size="large"
+              placeholder="Select an illness type"
+              style={{ width: "100%" }}
+              onChange={(value) => setShowOtherField(value === "Other")}
+            >
               {illnessOptions.map((item) => (
-                <Option key={item.key} value={item.label}>
+                <Select.Option key={item.key} value={item.label}>
                   {item.label}
-                </Option>
+                </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+
+          {showOtherField && (
+            <Form.Item
+              label="Specify Illness"
+              name="otherIllness"
+              rules={[{ required: true, message: "Please specify the illness" }]}
+            >
+              <Input size="large" placeholder="Enter illness name" />
+            </Form.Item>
+          )}
+
+          <Form.Item
+            label="Severity Level"
+            name="severityLevel"
+            rules={[{ required: true, message: "Please select a severity level" }]}
+            >
+            <Radio.Group
+              block
+              options={severityOptions}
+              defaultValue="Mild"
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
 
           <Form.Item
@@ -324,20 +347,6 @@ useEffect(() => {
               disabledDate={(current) =>
                 current && current >= moment().endOf("day")
               }
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Severity Level"
-            name="severityLevel"
-            rules={[{ required: true, message: "Please select a severity level" }]}
-            >
-            <Radio.Group
-              block
-              options={severityOptions}
-              defaultValue="Mild"
-              optionType="button"
-              buttonStyle="solid"
             />
           </Form.Item>
 

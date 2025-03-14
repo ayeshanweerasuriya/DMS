@@ -22,7 +22,7 @@ const illnessTypes = [
 
 const addPatient = async (req, res) => {
     try {
-        const { name, age, illnessType, contactNumber, dateOfBirth, notes, severityLevel } = req.body;
+        const { name, age, illnessType, contactNumber, dateOfBirth, notes, severityLevel, otherIllness } = req.body;
 
         // Validate required fields
         if (!name || !age || !illnessType || !contactNumber || !dateOfBirth) {
@@ -44,6 +44,14 @@ const addPatient = async (req, res) => {
             return res.status(400).json({ 
                 message: "Invalid illness type. Please select a valid option.", 
                 status: 400 
+            });
+        }
+
+        // If illnessType is "Other", ensure otherIllness is provided
+        if (illnessType === "Other" && (!otherIllness || otherIllness.trim() === "")) {
+            return res.status(400).json({
+                message: "Please specify the illness when selecting 'Other'.",
+                status: 400
             });
         }
 
@@ -74,10 +82,11 @@ const addPatient = async (req, res) => {
             name,
             age,
             illnessType,
+            otherIllness: illnessType === "Other" ? otherIllness : undefined,
             contactNumber,
             dateOfBirth,
             notes,
-            severityLevel
+            severityLevel,
         });
 
         await newPatient.save();
@@ -99,6 +108,19 @@ const updatePatient = async (req, res) => {
             if (dob >= new Date()) {
                 return res.status(400).json({ message: "Date of birth cannot be today or a future date.", status: 400 });
             }
+        }
+
+        // If illnessType is "Other", ensure otherIllness is provided
+        if (updates.illnessType === "Other") {
+            if (!updates.otherIllness || updates.otherIllness.trim() === "") {
+                return res.status(400).json({
+                    message: "Please specify the illness when selecting 'Other'.",
+                    status: 400
+                });
+            }
+        } else {
+            // Remove otherIllness if illnessType is not "Other"
+            updates.otherIllness = undefined;
         }
 
         const updatedPatient = await Patient.findByIdAndUpdate(id, updates, { new: true, runValidators: true });

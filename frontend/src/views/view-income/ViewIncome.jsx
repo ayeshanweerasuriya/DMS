@@ -55,7 +55,6 @@ export function ViewIncome() {
   }, [refetchData]);
 
   const handleSave = async () => {
-    setLoading(true);
     try {
       const response = await updateHospitalFee({
         newHospitalFee: hospitalCharge,
@@ -66,8 +65,6 @@ export function ViewIncome() {
     } catch (error) {
       console.error("error: ", error);
       message.error("Failed to save hospital charge");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -77,13 +74,6 @@ export function ViewIncome() {
       dataIndex: "name",
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name), // Sorting alphabetically by name
-    },
-    {
-      title: "Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (text) => new Date(text).toLocaleDateString(), // Format the date as needed
-      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt), // Sort by date
     },
     {
       title: "Treatment Fee",
@@ -109,6 +99,13 @@ export function ViewIncome() {
       sorter: (a, b) => a.totalFee - b.totalFee, // Sort by total fee (numeric)
     },
     {
+      title: "Date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => new Date(text).toLocaleDateString(), // Format the date as needed
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt), // Sort by date
+    },
+    {
       title: "Action",
       key: "action",
       render: (_, record) => (
@@ -121,16 +118,6 @@ export function ViewIncome() {
       ),
     },
   ];
-
-  const isEndOfMonth = () => {
-    const today = new Date();
-    const lastDayOfMonth = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      0
-    );
-    return today.getDate() === lastDayOfMonth.getDate();
-  };
 
   return (
     <Flex vertical style={{}}>
@@ -204,7 +191,6 @@ export function ViewIncome() {
                 <InputNumber
                   min={0}
                   value={hospitalCharge}
-                  disabled={!isEndOfMonth()}
                   onChange={setHospitalCharge}
                   style={{
                     width: "300px",
@@ -216,17 +202,10 @@ export function ViewIncome() {
                   type="primary"
                   onClick={handleSave}
                   style={{ marginLeft: "8px" }}
-                  disabled={!isEndOfMonth()}
                 >
                   Save
                 </Button>
               </div>
-              {!isEndOfMonth() && (
-                  <div style={{ color: "red", marginTop: "8px" }}>
-                    *Hospital Charge can only be updated on the last day of the
-                    month.
-                  </div>
-                )}
             </div>
           </Card>
         </Col>

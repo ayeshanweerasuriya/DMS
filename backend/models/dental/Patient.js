@@ -23,6 +23,7 @@ const patientSchema = new mongoose.Schema({
         enum: illnessTypes, // Only accepts these values
         maxlength: 200 
       },
+    otherIllness: { type: String, maxlength: 200 },
     contactNumber: { type: String, required: true, match: /^[0-9]{1,15}$/ },
     dateOfBirth: { 
         type: Date, 
