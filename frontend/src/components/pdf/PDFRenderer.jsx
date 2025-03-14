@@ -111,10 +111,11 @@ export function PDFInvoice({ record }) {
 
   const treatments = [
     { name: "Comprehensive Dental Examination Fee", amount: record.treatmentFee || "-" },
-    { name: "Prescription Medication Fee", amount: record.medicationFee || "-" }
+    { name: "Prescription Medication Fee", amount: record.medicationFee || "-" },
+    { name: "Hospital Fee", amount: record.hospitalFee ? record.hospitalFee.toString() : "-" }
   ];
 
-  const subtotal = treatments.reduce((total, item) => total + item.amount, 0);
+  const subtotal = treatments.reduce((total, item) => total + (parseFloat(item.amount) || 0), 0);
   const tax = subtotal * 0.05; // 5% GST
   const totalAmount = subtotal + tax;
 
@@ -185,34 +186,26 @@ export function PDFInvoice({ record }) {
 
         {/* Total Section */}
         <View style={styles.totalSection}>
-          <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
-            <Text style={styles.tableCell}>Subtotal:</Text>
-            <Text style={styles.tableCellAmount}>
-              Rs. {subtotal ? subtotal.toLocaleString("en-US") : "0.00"}
-            </Text>
-          </View>
-          <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
-            <Text style={styles.tableCell}>GST (5%):</Text>
-            <Text style={styles.tableCellAmount}>
-              Rs.{" "}
-              {tax
-                ? tax.toLocaleString("en-US", { maximumFractionDigits: 2 })
-                : "0.00"}
-            </Text>
-          </View>
-          <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
-            <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
-              Total Due:
-            </Text>
-            <Text style={[styles.tableCellAmount, { fontWeight: "bold" }]}>
-              Rs.{" "}
-              {totalAmount
-                ? totalAmount.toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
-                  })
-                : "0.00"}
-            </Text>
-          </View>
+        <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+  <Text style={styles.tableCell}>Subtotal:</Text>
+  <Text style={styles.tableCellAmount}>
+    Rs. {subtotal.toFixed(2)}
+  </Text>
+  </View>
+  <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+  <Text style={styles.tableCell}>GST (5%):</Text>
+  <Text style={styles.tableCellAmount}>
+    Rs. {tax.toFixed(2)}
+  </Text>
+</View>
+<View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+  <Text style={[styles.tableCell, { fontWeight: "bold" }]}>
+    Total Due:
+  </Text>
+  <Text style={[styles.tableCellAmount, { fontWeight: "bold" }]}>
+    Rs. {totalAmount.toFixed(2)}
+  </Text>
+  </View>
         </View>
 
         {/* Payment Instructions */}
