@@ -155,7 +155,6 @@ export function Sidebar({ collapsed, logOut }) {
       label: <Link to="/view-records">Patient Records</Link>,
       allowedRoles: ["Doctor", "Admin", "Staff"],
     },
-    
     {
       key: "/update-patients",
       icon: <UpCircleOutlined />,
