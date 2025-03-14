@@ -56,6 +56,37 @@ export const login = async (username, password) => {
   }
 };
 
+export const updateUserAccount = async (data) => {
+  console.log("data: ", data);
+  try {
+    const response = await api.patch(`/auth/update-account`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
+export const deleteUserAccount = async (userId) => {
+  try {
+    const response = await api.delete(`/auth/delete-account`, {
+      data: userId,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
+export const getAccountDetails = async (searchQuery = "", filter = null) => {
+  console.log("filter: ", filter);
+  try {
+    const response = await api.get(`/auth/account-details?search=${searchQuery}&filter=${filter}`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : "An error occurred";
+  }
+};
+
 // Other API calls to access data
 export const getPatientList = async (searchQuery = "", filter = null) => {
   console.log("searchQuery: ", searchQuery);
