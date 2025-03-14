@@ -79,56 +79,50 @@ export function AppointmentForm({
   const handleDateChange = (date, dateString) => {
     setSelectedDate(date);
 };
-  const onFinish = async (values) => {
-    if (!selectedDate) {
-      return;
+const onFinish = async (values) => {
+  if (!selectedDate) {
+    return;
   }
-  
-   // Format date to "YYYY-MM-DD"
-   // Ensure correct conversion
-   const formattedDate = selectedDate.toISOString(); // Convert to valid ISO format
-   createAppointment({ ...values, appointmentDate: formattedDate });
 
-    // Format time to "HH:MM AM/PM"
-    const timeObj = new Date(values.appointmentTime);
-    const formattedTime = timeObj.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+  // Format date to "YYYY-MM-DD"
+  const formattedDate = selectedDate.format("YYYY-MM-DD");
 
-    // Update values before passing to createAppointment
-    const formattedValues = {
-      ...values,
-      appointmentDate: formattedDate,
-      appointmentTime: formattedTime,
-    };
+  // Format time to "HH:MM AM/PM"
+  const formattedTime = moment(values.appointmentTime).format("hh:mm A");
 
-    try {
-      setLoading(true);
-      let response;
-      if (selectedRecord) {
-        // If selectedRecord exists, call the updateAppointment function
-        response = await updateAppointment(selectedRecord._id, formattedValues);
-      } else {
-        // If no selectedRecord, create a new appointment
-        response = await createAppointment(formattedValues);
-      }
-      if (response.status === 200) {
-        Message("success", response.message, 2);
-        form.resetFields();
-        setRefetchCalendarData(true);
-        setRefetchData(true);
-        if (selectedRecord) {
-          closeDrawer();
-        }
-      }
-    } catch (error) {
-      console.error("Failed to save appointment:", error);
-    } finally {
-      setLoading(false);
-    }
+  // Prepare the final values object
+  const formattedValues = {
+    ...values,
+    appointmentDate: formattedDate,
+    appointmentTime: formattedTime,
   };
+
+  try {
+    if (setLoading) setLoading(true); // Check before using setLoading
+    let response;
+
+    if (selectedRecord) {
+      response = await updateAppointment(selectedRecord._id, formattedValues);
+    } else {
+      response = await createAppointment(formattedValues);
+    }
+
+    if (response.status === 200) {
+      Message("success", response.message, 2);
+      form.resetFields();
+      setRefetchCalendarData(true);
+      setRefetchData(true);
+      if (selectedRecord) {
+        closeDrawer();
+      }
+    }
+  } catch (error) {
+    console.error("Failed to save appointment:", error);
+  } finally {
+    if (setLoading) setLoading(false);
+  }
+};
+
 
   return (
     <>
