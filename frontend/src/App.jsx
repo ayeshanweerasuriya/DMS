@@ -8,6 +8,7 @@ import {
   Typography,
   Space,
   Avatar,
+  FloatButton,
 } from "antd";
 import { useState, useEffect } from "react";
 import {
@@ -20,6 +21,7 @@ import {
   UserAddOutlined,
   LogoutOutlined,
   DollarOutlined,
+  FileOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { LogIn } from "./views/auth/LogIn";
@@ -65,6 +67,7 @@ export function CustomHeader({ collapsed, setCollapsed }) {
   };
 
   return (
+    // blue header
     <Header
       style={{
         display: "flex",
@@ -75,6 +78,7 @@ export function CustomHeader({ collapsed, setCollapsed }) {
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
+      {/* toggle icon */}
       <Button
         type="text"
         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -125,8 +129,23 @@ export function CustomHeader({ collapsed, setCollapsed }) {
               fontSize: 20,
             }}
           />
+
+           {/* Floating Button */}
+      <FloatButton 
+        tooltip={<div>Documents</div>}
+        style={{
+          position: "absolute",
+          bottom: 20,
+          right: 20,
+          backgroundColor: "#1a75ff",
+        }}
+        icon={< FileOutlined />} // 
+  href="https://drive.google.com/file/d/17czhLcaOVjM-w5ylXUxfw6caRnMuTpZD/view?usp=sharing"
+  target="_blank" // This will open the link in a new tab
+      />
         </Space>
       )}
+
     </Header>
   );
 }
