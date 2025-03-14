@@ -28,6 +28,7 @@ export function AddPatientsForm({handleRedirect}) {
   const [form] = Form.useForm(); // Form instance
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
+  const [showOtherField, setShowOtherField] = useState(false);
 
   const onFinish = async (values) => {
     try {
@@ -96,15 +97,45 @@ export function AddPatientsForm({handleRedirect}) {
           <Form.Item
             label="Illness Type"
             name="illnessType"
-            rules={[{ required: true, message: "Please select an illness type" }]}
+            rules={[
+              { required: true, message: "Please select an illness type" },
+            ]}
           >
-            <Select size="large" placeholder="Select an illness type" style={{ width: "100%" }}>
+            <Select
+              size="large"
+              placeholder="Select an illness type"
+              style={{ width: "100%" }}
+              onChange={(value) => setShowOtherField(value === "Other")}
+            >
               {illnessOptions.map((item) => (
-                <Option key={item.key} value={item.label}>
+                <Select.Option key={item.key} value={item.label}>
                   {item.label}
-                </Option>
+                </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+
+          {showOtherField && (
+            <Form.Item
+              label="Specify Illness"
+              name="otherIllness"
+              rules={[{ required: true, message: "Please specify the illness" }]}
+            >
+              <Input size="large" placeholder="Enter illness name" />
+            </Form.Item>
+          )}
+          <Form.Item
+            label="Severity Level"
+            name="severityLevel"
+            rules={[{ required: true, message: "Please select a severity level" }]}
+            >
+          <Radio.Group
+            block
+            options={severityOptions}
+            defaultValue="Mild"
+            optionType="button"
+            buttonStyle="solid"
+          />
           </Form.Item>
           <Form.Item
             label="Contact Number"
@@ -132,19 +163,6 @@ export function AddPatientsForm({handleRedirect}) {
               style={{ width: "100%" }}
               disabledDate={(current) => current && current >= moment().endOf("day")}
             />
-          </Form.Item>
-          <Form.Item
-            label="Severity Level"
-            name="severityLevel"
-            rules={[{ required: true, message: "Please select a severity level" }]}
-            >
-          <Radio.Group
-            block
-            options={severityOptions}
-            defaultValue="Mild"
-            optionType="button"
-            buttonStyle="solid"
-          />
           </Form.Item>
         </Col>
         <Col span={12}>

@@ -114,21 +114,25 @@ const updateHospitalFee = async (req, res) => {
     feeConfig.updatedAt = new Date();
     await feeConfig.save();
 
-    const result = await Patient.updateMany(
-      {},
-      { $set: { hospitalFee: newHospitalFee } }
-    );
+    return res.status(200).json({
+      message: "Hospital fee updated successfully.",
+    });
 
-    if (result.nModified > 0) {
-      return res.status(200).json({
-        message: `${result.nModified} patients' hospital fees updated successfully.`,
-        updatedCount: result.nModified,
-      });
-    } else {
-      return res.status(200).json({
-        message: `Hospital fee updated, but the value was the same for all patients.`,
-      });
-    }
+    // const result = await Patient.updateMany(
+    //   {},
+    //   { $set: { hospitalFee: newHospitalFee } }
+    // );
+
+    // if (result.nModified > 0) {
+    //   return res.status(200).json({
+    //     message: `${result.nModified} patients' hospital fees updated successfully.`,
+    //     updatedCount: result.nModified,
+    //   });
+    // } else {
+    //   return res.status(200).json({
+    //     message: `Hospital fee updated, but the value was the same for all patients.`,
+    //   });
+    // }
   } catch (error) {
     console.error("Error updating hospital fee:", error);
     return res.status(500).json({

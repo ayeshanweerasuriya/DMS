@@ -255,6 +255,14 @@ export function DetailedView({ selectedPatient }) {
       <Descriptions.Item label="Illness">
         {selectedPatient.illnessType || "N/A"}
       </Descriptions.Item>
+      {selectedPatient.illnessType === "Other" && (
+        <Descriptions.Item label="Other Illness">
+        {selectedPatient.otherIllness || "N/A"}
+      </Descriptions.Item>
+      )}
+      <Descriptions.Item label="Serverity Level">
+        {selectedPatient.severityLevel || "Mild"}
+      </Descriptions.Item>
       <Descriptions.Item label="Contact">
         {selectedPatient.contactNumber || "N/A"}
       </Descriptions.Item>
@@ -262,9 +270,6 @@ export function DetailedView({ selectedPatient }) {
         {selectedPatient.dateOfBirth
           ? new Date(selectedPatient.dateOfBirth).toLocaleDateString()
           : "N/A"}
-      </Descriptions.Item>
-      <Descriptions.Item label="Serverity Level">
-        {selectedPatient.severityLevel || "Mild"}
       </Descriptions.Item>
       <Descriptions.Item label="Notes">
         <Paragraph
