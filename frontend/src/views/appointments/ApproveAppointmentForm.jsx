@@ -1,8 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  Flex,
-  Divider,
-  Typography,
   Input,
   Form,
   DatePicker,
@@ -12,58 +9,85 @@ import {
   Button,
   Space,
   Select,
-  Radio 
 } from "antd";
+
 import { PhoneOutlined } from "@ant-design/icons";
+import moment from "moment";
+import { deleteAppointment, createPatient } from "../../apiService";
 import { Message } from "../../components/message/Message";
 import { useNavigate } from "react-router-dom";
-import { createPatient } from "../../apiService";
-import moment from "moment";
-import { NotificationAlert } from "../../components/notification-alert/NotificationAlert";
-import { illnessOptions, severityOptions } from "../constants/options";
+import { illnessOptions } from "../constants/options";
 
 const { Option } = Select;
 
-export function AddPatientsForm({handleRedirect}) {
-  const [form] = Form.useForm(); // Form instance
+export function ApproveAppointmentForm({
+  selectedRecord,
+  closeDrawer,
+  onDelete,
+  setRefetchData,
+  setLoading,
+}) {
   const navigate = useNavigate();
-  const [success, setSuccess] = useState(false);
+  const [form] = Form.useForm();
   const [showOtherField, setShowOtherField] = useState(false);
 
+  // Set initial values when selectedRecord changes
+  useEffect(() => {
+    if (selectedRecord) {
+      form.setFieldsValue({
+        name: selectedRecord.patientName || "",
+        age: selectedRecord.patientAge || null,
+        illnessType: "",
+        otherIllness: "",
+        contactNumber: selectedRecord.contactNumber || "",
+        dateOfBirth: null,
+        notes: "",
+      });
+    }
+  }, [selectedRecord, form]);
+
   const onFinish = async (values) => {
+    setLoading(true);
     try {
       const formattedValues = {
         ...values,
         dateOfBirth: values.dateOfBirth
           ? values.dateOfBirth.format("YYYY-MM-DD")
-          : null, // Ensure the correct key
+          : null,
       };
       const response = await createPatient(formattedValues);
+      console.log("response: ", response);
       if (response.status === 201) {
-        Message("success", response.message, 2);
-        form.resetFields();
-        setSuccess(true);
+        Message("success", "Appointment approved successfully", 2);
+        closeDrawer();
       } else {
         Message("error", response.message, 5);
       }
     } catch (error) {
-      console.error("Error adding patient:", error);
-      Message("error", "Failed to save patient", 3);
+      console.error("Error approving appointment:", error);
+      Message("error", "Failed to approve appointment", 3);
     }
-  };
-
-  const navigateToUpdateRecords = () => {
-      navigate("/update-patients");
+    try {
+      const response = await deleteAppointment(selectedRecord._id);
+      if (response.status === 200) {
+        // Message("success", response.message, 2);
+        setRefetchData(true);
+        closeDrawer();
+      }
+    } catch (error) {
+      console.error("Failed to remove the appointment from the list: ", error);
+      Message("error", "Failed to remove the appointment from the list", 3);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Form
       form={form}
-      name="add-patient-form"
-      onFinish={onFinish}
+      name="update-patient-form"
       layout="vertical"
-      labelCol={{ span: 6 }} // Increase this value
-      wrapperCol={{ span: 18 }} // Adjust accordingly
+      onFinish={onFinish}
     >
       <Row gutter={16}>
         <Col span={12}>
@@ -72,8 +96,9 @@ export function AddPatientsForm({handleRedirect}) {
             name="name"
             rules={[{ required: true }]}
           >
-            <Input size="large" style={{ width: "100%" }} />
+            <Input size="large" />
           </Form.Item>
+
           <Form.Item
             label="Patient Age"
             name="age"
@@ -84,8 +109,7 @@ export function AddPatientsForm({handleRedirect}) {
               min={1}
               max={150}
               changeOnWheel
-              initialvalues={3}
-              parser={(value) => value.replace(/\D/g, "")}  // Strips non-numeric input
+              parser={(value) => value.replace(/\D/g, "")} // Strips non-numeric input
               onKeyPress={(e) => {
                 if (!/^\d+$/.test(e.key)) {
                   e.preventDefault(); // Prevents non-numeric key press
@@ -94,6 +118,7 @@ export function AddPatientsForm({handleRedirect}) {
               style={{ width: "100%" }}
             />
           </Form.Item>
+
           <Form.Item
             label="Illness Type"
             name="illnessType"
@@ -126,122 +151,70 @@ export function AddPatientsForm({handleRedirect}) {
               <Input size="large" placeholder="Enter illness name" />
             </Form.Item>
           )}
-          <Form.Item
-            label="Severity Level"
-            name="severityLevel"
-            rules={[{ required: true, message: "Please select a severity level" }]}
-            >
-          <Radio.Group
-            block
-            options={severityOptions}
-            defaultValue="Mild"
-            optionType="button"
-            buttonStyle="solid"
-          />
-          </Form.Item>
+
           <Form.Item
             label="Contact Number"
             name="contactNumber"
             rules={[
               { required: true, message: "Contact number is required" },
-              { pattern: /^[0-9]{10}$/, message: "Contact number must be exactly 10 digits" },
+              {
+                pattern: /^[0-9]{10}$/,
+                message: "Contact number must be exactly 10 digits",
+              },
             ]}
           >
             <Input
               size="large"
-              placeholder="0701231231"
               prefix={<PhoneOutlined />}
+              maxLength={10}
+              placeholder="0701231231"
               style={{ width: "100%" }}
-              maxLength={10} // Prevents entering more than 10 characters
             />
           </Form.Item>
+
           <Form.Item
             label="Date of Birth"
             name="dateOfBirth"
-            rules={[{ required: true, message: "Date of Birth is required" }]}
+            rules={[{ required: true }]}
           >
             <DatePicker
               size="large"
               style={{ width: "100%" }}
-              disabledDate={(current) => current && current >= moment().endOf("day")}
+              disabledDate={(current) =>
+                current && current >= moment().endOf("day")
+              }
             />
           </Form.Item>
         </Col>
+
         <Col span={12}>
-          <Form.Item
-            label="Patient Notes"
-            name="notes"
-            rules={[{ required: false }]}
-          >
-            <Input.TextArea
-              rows={7} // Specify the number of rows you want
-              size="large"
-              placeholder="Add Patient's Notes Here.."
-              style={{ width: "100%" }}
-            />
+          <Form.Item label="Patient Notes" name="notes">
+            <Input.TextArea rows={7} placeholder="Add Patient's Notes Here.." />
           </Form.Item>
-          <Form.Item label="ㅤ" rules={[{ required: true }]}>
-            <Space size={"large"}>
+
+          <Form.Item>
+            <Space size="large">
               <Button
-                style={{ backgroundColor: "#16BE12", color: "#fff" }}
-                size="large"
                 type="primary"
                 htmlType="submit"
+                style={{ backgroundColor: "#16BE12", color: "#fff" }}
               >
-                Save
+                Approve
               </Button>
-              <Button
-                style={{ backgroundColor: "#000", color: "#fff" }}
-                size="large"
-                type="primary"
-                onClick={() => form.resetFields()}
-              >
+              <Button type="default" onClick={() => form.resetFields()}>
                 Clear
               </Button>
               <Button
-                style={{ backgroundColor: "#1890ff", color: "#fff" }}
-                size="large"
                 type="primary"
-                onClick={handleRedirect}
+                style={{ backgroundColor: "#1890ff", color: "#fff" }}
+                onClick={() => navigate("/view-records")}
               >
                 Patient Records
               </Button>
             </Space>
           </Form.Item>
-          {success && (
-            <div style={{ marginTop: "16px" }}>
-              <NotificationAlert
-                message="To Update Patient Records"
-                type="info"
-                buttonText="Click Here"
-                onButtonClick={navigateToUpdateRecords}
-                duration={10}
-              />
-            </div>
-          )}
         </Col>
       </Row>
     </Form>
-  );
-}
-
-export function AddPatients() {
-  const { Title } = Typography;
-  const navigate = useNavigate();
-
-  const handleRedirect = () => {
-    navigate("/view-records");
-  };
-
-  return (
-    // <AddPatientsForm handleRedirect={handleRedirect}/>
-    <Flex vertical>
-      <Typography>
-        <Divider orientation="left">
-          <Title level={2}>Add Patients</Title>
-        </Divider>
-      </Typography>
-      <AddPatientsForm handleRedirect={handleRedirect} />
-    </Flex>
   );
 }

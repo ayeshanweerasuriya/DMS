@@ -1,8 +1,28 @@
 const Patient = require("../models/dental/Patient.js");
 
+const illnessTypes = [
+    "Cavities",
+    "Gingivitis",
+    "Periodontitis",
+    "Tooth Decay",
+    "Oral Cancer",
+    "Bruxism",
+    "Impacted Teeth",
+    "Tooth Sensitivity",
+    "Halitosis",
+    "TMJ Disorders",
+    "Other",
+  ];
+
+  const severityOptions = [
+    { label: 'Mild', value: 'Mild' },
+    { label: 'Moderate', value: 'Moderate' },
+    { label: 'Severe', value: 'Severe' }
+];
+
 const addPatient = async (req, res) => {
     try {
-        const { name, age, illnessType, contactNumber, dateOfBirth, notes } = req.body;
+        const { name, age, illnessType, contactNumber, dateOfBirth, notes, severityLevel, otherIllness } = req.body;
 
         // Validate required fields
         if (!name || !age || !illnessType || !contactNumber || !dateOfBirth) {
@@ -20,8 +40,19 @@ const addPatient = async (req, res) => {
         }
 
         // Validate illness type length
-        if (illnessType.length > 200) {
-            return res.status(400).json({ message: "Illness type must be at most 200 characters.", status: 400 });
+        if (!illnessTypes.includes(illnessType)) {
+            return res.status(400).json({ 
+                message: "Invalid illness type. Please select a valid option.", 
+                status: 400 
+            });
+        }
+
+        // If illnessType is "Other", ensure otherIllness is provided
+        if (illnessType === "Other" && (!otherIllness || otherIllness.trim() === "")) {
+            return res.status(400).json({
+                message: "Please specify the illness when selecting 'Other'.",
+                status: 400
+            });
         }
 
         // Validate contact number
@@ -36,6 +67,11 @@ const addPatient = async (req, res) => {
             return res.status(400).json({ message: "Date of birth cannot be today or a future date.", status: 400 });
         }
 
+        // Validate severity level
+        if (severityLevel && !severityOptions.map((option) => option.value).includes(severityLevel)) {
+            return res.status(400).json({ message: "Invalid severity level. Please select a valid option.", status: 400 });
+        }
+
         // Validate notes length
         if (notes && notes.length > 2500) {
             return res.status(400).json({ message: "Patient notes must be at most 2500 characters.", status: 400 });
@@ -46,9 +82,11 @@ const addPatient = async (req, res) => {
             name,
             age,
             illnessType,
+            otherIllness: illnessType === "Other" ? otherIllness : undefined,
             contactNumber,
             dateOfBirth,
             notes,
+            severityLevel,
         });
 
         await newPatient.save();
@@ -70,6 +108,19 @@ const updatePatient = async (req, res) => {
             if (dob >= new Date()) {
                 return res.status(400).json({ message: "Date of birth cannot be today or a future date.", status: 400 });
             }
+        }
+
+        // If illnessType is "Other", ensure otherIllness is provided
+        if (updates.illnessType === "Other") {
+            if (!updates.otherIllness || updates.otherIllness.trim() === "") {
+                return res.status(400).json({
+                    message: "Please specify the illness when selecting 'Other'.",
+                    status: 400
+                });
+            }
+        } else {
+            // Remove otherIllness if illnessType is not "Other"
+            updates.otherIllness = undefined;
         }
 
         const updatedPatient = await Patient.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
@@ -102,28 +153,39 @@ const deletePatient = async (req, res) => {
 };
 
 const getPatients = async (req, res) => {
-  try {
-    const searchQuery = req.query.search; // Get search query from request
+    try {
+      const { search, filter } = req.query; // Get search and filter query parameters
+  
+      let query = {};
+  
+      // Apply search filter (name or contact number)
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } }, // Case-insensitive name search
+          { contactNumber: { $regex: search, $options: "i" } }, // Case-insensitive contact number search
+        ];
+      }
+  
+      // Apply illness type filter (ignore if "All" is selected)
+      if (filter && filter !== "0") {
 
-    let filter = {};
-    if (searchQuery) {
-      filter = {
-        $or: [
-          { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive name search
-          { contactNumber: { $regex: searchQuery, $options: "i" } }, // Case-insensitive contact number search
-        ],
-      };
+        const illnessIndex = parseInt(filter, 10); // Convert key to integer
+  
+        if (!isNaN(illnessIndex) && illnessIndex > 0 && illnessIndex <= illnessTypes.length) {
+          query.illnessType = illnessTypes[illnessIndex - 1]; // Match illnessType based on key
+        }
+      }
+  
+      const patients = await Patient.find(query);
+      return res
+        .status(200)
+        .json({ message: "Patients retrieved successfully", patients });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    const patients = await Patient.find(filter);
-    return res
-      .status(200)
-      .json({ message: "Patients retrieved successfully", patients });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
+  };
+  
 
 module.exports = {
     addPatient,

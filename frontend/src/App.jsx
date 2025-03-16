@@ -1,5 +1,15 @@
 import { Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
-import { Button, Layout, Menu, theme, ConfigProvider, Typography, Space } from "antd";
+import {
+  Button,
+  Layout,
+  Menu,
+  theme,
+  ConfigProvider,
+  Typography,
+  Space,
+  Avatar,
+  FloatButton,
+} from "antd";
 import { useState, useEffect } from "react";
 import {
   UsergroupAddOutlined,
@@ -11,7 +21,10 @@ import {
   UserAddOutlined,
   LogoutOutlined,
   DollarOutlined,
-  UserOutlined
+  FileOutlined,
+  UserOutlined,
+  SettingOutlined,
+  QuestionCircleOutlined
 } from "@ant-design/icons";
 import { LogIn } from "./views/auth/LogIn";
 import { Appointments } from "./views/appointments/Appointments";
@@ -20,37 +33,35 @@ import { AddPatients } from "./views/add-patients/AddPatients";
 import { UpdatePatients } from "./views/update-patients/UpdatePatients";
 import { DeletePatients } from "./views/delete-patients/DeletePatients";
 import { ViewIncome } from "./views/view-income/ViewIncome";
-import { Message } from "./components/message/Message";
+import { Settings } from "./views/settings/Settings";
+import { NotFound } from "./views/not-found/NotFound";
+import { ProtectedRoute } from "./utils/ProtectedRoute";
+import { DateTime } from "luxon";
 
 const { Header, Sider } = Layout;
 const { Text } = Typography;
 
-
 export function CustomHeader({ collapsed, setCollapsed }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [user, setUser] = useState(null);
+  const formattedDateTime = DateTime.now().toFormat(
+    "EEEE, MMM dd, yyyy - hh:mm a"
+  );
 
   useEffect(() => {
-    // Update time every second
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 
-    // Retrieve user details from storage
     const storedUser = {
       username: sessionStorage.getItem("username"),
       displayname: sessionStorage.getItem("displayname"),
       role: sessionStorage.getItem("role"),
     };
-    
-    if (storedUser.username) {
-      setUser(storedUser);
-    }
 
-    return () => clearInterval(timer); // Cleanup on unmount
+    if (storedUser.username) setUser(storedUser);
+
+    return () => clearInterval(timer);
   }, []);
 
-  // Determine greeting based on the time of login
   const getGreeting = () => {
     const hour = currentTime.getHours();
     if (hour < 12) return "Good Morning";
@@ -59,6 +70,7 @@ export function CustomHeader({ collapsed, setCollapsed }) {
   };
 
   return (
+    // blue header
     <Header
       style={{
         display: "flex",
@@ -69,29 +81,71 @@ export function CustomHeader({ collapsed, setCollapsed }) {
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
-      {/* Sidebar Toggle Button */}
+      {/* toggle icon */}
       <Button
         type="text"
         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         onClick={() => setCollapsed(!collapsed)}
         style={{
-          fontSize: "16px",
+          fontSize: 16,
           width: 64,
           height: 64,
+          background: "transparent",
+          border: "none",
+          color: "#fff",
         }}
       />
 
-      {/* Real-time Date & Time */}
-      <Text strong style={{ fontSize: "16px", color: "#fff" }}>
-        {currentTime.toLocaleDateString()} - {currentTime.toLocaleTimeString()}
+      <Text strong style={{ fontSize: 16, color: "#fff", marginRight: "20px" }}>
+        {formattedDateTime}
       </Text>
 
-      {/* User Info Section */}
       {user && (
         <Space>
-          <Text style={{ fontSize: "16px", color: "#fff" }} strong>{getGreeting()}, {user.displayname}!</Text>
-          <Text style={{ fontSize: "16px", color: "#fff" }} type="secondary">({user.role})</Text>
-          <UserOutlined style={{ fontSize: 20 }} />
+        <a 
+          href="https://drive.google.com/file/d/17czhLcaOVjM-w5ylXUxfw6caRnMuTpZD/view?usp=sharing" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          <QuestionCircleOutlined
+            style={{
+              fontSize: 20,
+              color: "#fff",
+              marginRight: "20px",
+              cursor: "pointer",
+            }}
+          />
+        </a>
+          <Text
+            strong
+            style={{
+              fontSize: 16,
+              color: "#fff",
+              marginRight: "10px",
+            }}
+          >
+            {getGreeting()}, {user.displayname}!
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#fff",
+              fontWeight: "normal",
+              marginRight: "15px",
+            }}
+            type="secondary"
+          >
+            ({user.role})
+          </Text>
+          <Avatar
+            size="large"
+            icon={<UserOutlined />}
+            style={{
+              backgroundColor: "#fff",
+              color: "#1677ff",
+              fontSize: 20,
+            }}
+          />
         </Space>
       )}
     </Header>
@@ -100,39 +154,66 @@ export function CustomHeader({ collapsed, setCollapsed }) {
 
 export function Sidebar({ collapsed, logOut }) {
   const location = useLocation();
+  const [showText, setShowText] = useState(false);
+  const userRole = sessionStorage.getItem("role");
 
   const menuItems = [
     {
       key: "/appointments",
       icon: <UsergroupAddOutlined />,
       label: <Link to="/appointments">Appointments</Link>,
-    },
-    {
-      key: "/view-records",
-      icon: <FolderViewOutlined />,
-      label: <Link to="/view-records">View Records</Link>,
+      allowedRoles: ["Staff", "Admin"],
     },
     {
       key: "/add-patients",
       icon: <UserAddOutlined />,
       label: <Link to="/add-patients">Add Patients</Link>,
+      allowedRoles: ["Staff", "Admin"],
+    },
+    {
+      key: "/view-records",
+      icon: <FolderViewOutlined />,
+      label: <Link to="/view-records">Patient Records</Link>,
+      allowedRoles: ["Doctor", "Admin", "Staff"],
     },
     {
       key: "/update-patients",
       icon: <UpCircleOutlined />,
       label: <Link to="/update-patients">Update Patients</Link>,
+      allowedRoles: ["Doctor", "Staff", "Admin"],
     },
     {
       key: "/delete-patients",
       icon: <DeleteOutlined />,
       label: <Link to="/delete-patients">Delete Patients</Link>,
+      allowedRoles: ["Staff", "Admin"],
     },
     {
       key: "/view-income",
       icon: <DollarOutlined />,
       label: <Link to="/view-income">View Income</Link>,
+      allowedRoles: ["Doctor", "Admin"],
+    },
+    {
+      key: "/settings",
+      icon: <SettingOutlined />,
+      label: <Link to="/settings">Settings</Link>,
+      allowedRoles: ["Admin"],
     },
   ];
+
+  const filteredMenuItems = menuItems.filter((item) =>
+    item.allowedRoles.includes(userRole)
+  );
+
+  useEffect(() => {
+    if (!collapsed) {
+      const timer = setTimeout(() => setShowText(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setShowText(false);
+    }
+  }, [collapsed]);
 
   return (
     <Sider
@@ -159,7 +240,7 @@ export function Sidebar({ collapsed, logOut }) {
           marginBottom: "16px",
         }}
       >
-        {collapsed ? "🦷" : "🦷 DentalEase"}
+        {collapsed ? "🦷" : `🦷 ${showText ? "DentalEase" : ""}`}
       </div>
 
       {/* Main Menu */}
@@ -167,48 +248,46 @@ export function Sidebar({ collapsed, logOut }) {
         theme="light"
         mode="inline"
         selectedKeys={[location.pathname]}
-        items={menuItems}
+        items={filteredMenuItems}
         style={{
           fontSize: "16px",
           borderRight: "none",
         }}
       />
 
-    {/* Logout Button - Styled Separately */}
-    <div
-      style={{
-        position: "absolute",
-        bottom: 5,
-        left: 5, // Aligns with menu item spacing
-        right: 5, // Aligns with menu item spacing
-        width: "calc(100% - 10px)", // Ensures it doesn't touch the edges
-        textAlign: "center",
-        padding: "12px 0",
-        cursor: "pointer",
-        fontSize: "16px",
-        fontWeight: "bold",
-        backgroundColor: "#FF4D4F", // Red background
-        color: "#fff", // White text
-        borderRadius: "6px", // Slightly rounded corners
-      }}
-      onClick={logOut}
-    >
-      {collapsed ? (
-        <LogoutOutlined />
-      ) : (
-        <span>
-          <LogoutOutlined /> Logout
-        </span>
-      )}
-    </div>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 5,
+          left: 5,
+          right: 5,
+          width: "calc(100% - 10px)",
+          textAlign: "center",
+          padding: "12px 0",
+          cursor: "pointer",
+          fontSize: "16px",
+          fontWeight: "bold",
+          backgroundColor: "#FF4D4F",
+          color: "#fff",
+          borderRadius: "6px",
+        }}
+        onClick={logOut}
+      >
+        {collapsed ? (
+          <LogoutOutlined />
+        ) : (
+          <span>
+            <LogoutOutlined /> {showText ? "Logout" : ""}
+          </span>
+        )}
+      </div>
     </Sider>
   );
 }
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  const { Sider, Content } = Layout;
-  const location = useLocation();
+  const { Content } = Layout;
   const isAuthenticated = sessionStorage.getItem("token") !== null;
 
   const borderRadiusLG = "25px";
@@ -216,13 +295,12 @@ function App() {
 
   const logOut = () => {
     sessionStorage.removeItem("token");
-    window.location.href = "/login"; // Force logout
+    window.location.href = "/login";
   };
 
-  // Show only the login page if the user is not authenticated
-  // if (!isAuthenticated) {
-  //   return <LogIn />;
-  // }
+  if (!isAuthenticated) {
+    return <LogIn />;
+  }
 
   return (
     <ConfigProvider
@@ -232,35 +310,92 @@ function App() {
         },
       }}
     >
-    {!isAuthenticated ? (
-      <LogIn />
-    ) : (      <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
-        <Sidebar collapsed={collapsed} logOut={logOut} />
-        <Layout>
-          <CustomHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-          <Content
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-              overflow: "auto",
-            }}
-          >
-            <Routes>
-            <Route path="/" element={<Navigate to="/appointments" replace />} />
-              <Route path="/appointments" element={<Appointments />} />
-              <Route path="/view-records" element={<ViewRecords />} />
-              <Route path="/add-patients" element={<AddPatients />} />
-              <Route path="/update-patients" element={<UpdatePatients />} />
-              <Route path="/delete-patients" element={<DeletePatients />} />
-              <Route path="/view-income" element={<ViewIncome />} />
-              <Route path="*" element={<Navigate to="/appointments" replace />} />
-            </Routes>
-          </Content>
+      {isAuthenticated && (
+        <Layout style={{ height: "100vh", backgroundColor: "#000" }}>
+          <Sidebar collapsed={collapsed} logOut={logOut} />
+          <Layout>
+            <CustomHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+            <Content
+              style={{
+                margin: "24px 16px",
+                padding: 24,
+                minHeight: 280,
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+                overflow: "auto",
+              }}
+            >
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <Navigate to="/appointments" replace />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/appointments"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <Appointments />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/view-records"
+                  element={
+                    <ProtectedRoute allowedRoles={["Doctor", "Admin", "Staff"]}>
+                      <ViewRecords />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/add-patients"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <AddPatients />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/update-patients"
+                  element={
+                    <ProtectedRoute allowedRoles={["Doctor", "Staff", "Admin"]}>
+                      <UpdatePatients />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/delete-patients"
+                  element={
+                    <ProtectedRoute allowedRoles={["Staff", "Admin"]}>
+                      <DeletePatients />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/view-income"
+                  element={
+                    <ProtectedRoute allowedRoles={["Doctor", "Admin"]}>
+                      <ViewIncome />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute allowedRoles={["Admin"]}>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>)}
+      )}
     </ConfigProvider>
   );
 }

@@ -4,19 +4,23 @@ import { TableComponent } from "../../components/table/TableComponent";
 import { DeleteFilled } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 import { getPatientList, deletePatient } from "../../apiService";
+import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
+import { illnessOptions } from "../constants/options";
 
 const { Title } = Typography;
 const { Search } = Input;
 
 export function DeletePatients() {
   const [data, setData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("0");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getPatientList(searchQuery)
+    setLoading(true);
+    getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
         setData(response.patients);
@@ -24,7 +28,8 @@ export function DeletePatients() {
       .catch((error) => {
         console.error("error: ", error);
       });
-  }, [searchQuery]);
+    setLoading(false);
+  }, [searchQuery, filter]);
 
   const handleSearch = (event) => {
     const value = event.target.value;
@@ -37,6 +42,7 @@ export function DeletePatients() {
   };
 
   const handleDeleteConfirm = async () => {
+    setLoading(true);
     if (selectedPatient) {
       deletePatient(selectedPatient._id)
         .then((response) => {
@@ -51,6 +57,7 @@ export function DeletePatients() {
     }
     setIsModalVisible(false);
     setSelectedPatient(null);
+    setLoading(false);
   };
 
   const handleCancel = () => {
@@ -107,15 +114,23 @@ export function DeletePatients() {
       </Typography>
 
       <Space direction="vertical" size="large">
-        <Row gutter={2}>
-          <Col span={12}>
+      <Row gutter={24}>
+          <Col span={8}>
             <Search
               placeholder="Search by name or contact number"
               onChange={handleSearch}
             />
           </Col>
+          <Col gutter={6}>
+            <DropdownMenu
+              label="Sort By Illness"
+              defaultOption="All"
+              onItemSelect={(item) => setFilter(item.key)}
+              items={illnessOptions}
+            />
+          </Col>
         </Row>
-        <TableComponent columns={columns} data={data} />
+        <TableComponent columns={columns} data={data} loading={loading}/>
       </Space>
       <Modal
         title="Confirm Deletion"

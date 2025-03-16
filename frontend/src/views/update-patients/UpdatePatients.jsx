@@ -12,19 +12,27 @@ import {
   Button,
   Space,
   Drawer,
+  Select,
+  Radio,
+  Tag
 } from "antd";
-import { PhoneOutlined, PrinterOutlined } from "@ant-design/icons";
+import { PhoneOutlined, PlusOutlined } from "@ant-design/icons";
 import { Message } from "../../components/message/Message";
 // import { useNavigate } from "react-router-dom";
-import { getPatientList } from "../../apiService";
+import { getHospitalFee, getPatientList } from "../../apiService";
 import { TableComponent } from "../../components/table/TableComponent";
 import { EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import moment from "moment";
 import { updatePatient } from "../../apiService";
 import { useNavigate } from "react-router-dom";
+import { DropdownMenu } from "../../components/dropdown/DropdownMenu";
+import VerticalSpace from "../../components/vertical-space";
+import { illnessOptions, severityOptions, severityColors } from "../constants/options";
 
+const { Search } = Input;
 const { Title } = Typography;
+const { Option } = Select;
 
 export function UpdatePatients() {
   const navigate = useNavigate();
@@ -32,18 +40,38 @@ export function UpdatePatients() {
   const [data, setData] = useState([]);
   const [record, setRecord] = useState({});
   const [refetch, setRefetch]=useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("0");
+  const [hospitalFee, setHospitalFee] = useState(undefined);
+  const [loading, setLoading] = useState(true);
+  const [showOtherField, setShowOtherField] = useState(false);
 
   useEffect(() => {
-    getPatientList()
+    setLoading(true);
+    getPatientList(searchQuery, filter)
       .then((response) => {
         console.log("response: ", response);
         setData(response.patients);
-        setRefetch(false)
       })
       .catch((error) => {
         console.error("error: ", error);
       });
-  }, [refetch]);
+    getHospitalFee()
+      .then((response) => {
+        console.log("response: ", response);
+        setHospitalFee(response.hospitalFee);
+      })
+      .catch((error) => {
+        console.error("error: ", error);
+      });
+    setLoading(false);
+    setRefetch(false);
+  }, [searchQuery, filter, refetch]);
+
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    setSearchQuery(value);
+  };
 
   const columns = [
     {
@@ -61,10 +89,17 @@ export function UpdatePatients() {
       dataIndex: "contactNumber",
     },
     {
-      title: "Date of Birth",
-      dataIndex: "dateOfBirth",
-      render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.dateOfBirth) - new Date(b.dateOfBirth),
+      title: "Illness Type",
+      dataIndex: "illnessType",
+      sorter: (a, b) => a.illnessType.localeCompare(b.illnessType),
+    },
+    {
+      title: "Severity Level",
+      dataIndex: "severityLevel",
+      sorter: (a, b) => a.severityLevel.localeCompare(b.severityLevel),
+      render: (severity) => (
+        <Tag color={severityColors[severity] || "#108ee9"}>{severity}</Tag>
+      )
     },
     {
       title: "Created At",
@@ -82,7 +117,7 @@ export function UpdatePatients() {
           onClick={() => showDrawer(record)}
         />
       ),
-    },
+    }
   ];
 
   const showDrawer = (record) => {
@@ -99,7 +134,24 @@ export function UpdatePatients() {
         <Divider orientation="left">
           <Title level={2}>Update Patients</Title>
         </Divider>
-        <TableComponent columns={columns} data={data || []} />
+        <Row gutter={24}>
+          <Col span={8}>
+            <Search
+              placeholder="Search by name or contact number"
+              onChange={handleSearch}
+            />
+          </Col>
+          <Col gutter={6}>
+            <DropdownMenu
+              label="Sort By Illness"
+              defaultOption="All"
+              onItemSelect={(item) => setFilter(item.key)}
+              items={illnessOptions}
+            />
+          </Col>
+        </Row>
+        <VerticalSpace height={"20px"} />
+        <TableComponent columns={columns} data={data || []} loading={loading} />
         {/* <Button onClick={showDrawer}></Button> */}
       </Typography>
       <Drawer
@@ -122,12 +174,13 @@ export function UpdatePatients() {
           </Space>
         }
         >
-      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose}/>
+      <UpdatePatientsForm data={record || {}} setRefetch={setRefetch} onClose={onClose} hospitalFee={hospitalFee} showOtherField={showOtherField} setShowOtherField={setShowOtherField} setLoading={setLoading}/>
       </Drawer>
     </Flex>
   );
 }
-export function UpdatePatientsForm({ data,setRefetch,onClose }){
+
+export function UpdatePatientsForm({ data, setRefetch, onClose, hospitalFee, setLoading, showOtherField, setShowOtherField }) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   
@@ -138,28 +191,22 @@ useEffect(() => {
       name: data.name || "",
       age: data.age || null,
       illnessType: data.illnessType || "",
+      otherIllness: data.illnessType === "Other" ? data.otherIllness : "",
       contactNumber: data.contactNumber || "",
       dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
+      severityLevel: data.severityLevel || "Mild",
       notes: data.notes || "",
       treatmentFee: data.treatmentFee || "",
       medicationFee: data.medicationFee || "",
+      hospitalFee: hospitalFee || "",
     });
-  }
-}, [data, form]);
 
-    // Set initial values
-    const initialValues = {
-      name: data.name || "",
-      age: data.age || null,
-      illnessType: data.illnessType || "",
-      contactNumber: data.contactNumber || "",
-      dateOfBirth: data.dateOfBirth ? dayjs(data.dateOfBirth) : null,
-      notes: data.notes || "",
-      treatmentFee: data.treatmentFee || "",
-      medicationFee: data.medicationFee || "",
-    };
+    setShowOtherField(data.illnessType === "Other");
+  }
+}, [data, form, hospitalFee, setShowOtherField]);
   
     const onFinish = async (values) => {
+    setLoading(true);
     try {
       const formattedValues = {
         ...values,
@@ -179,8 +226,12 @@ useEffect(() => {
     } catch (error) {
       console.error("Error updating patient:", error);
       Message("error", "Failed to save patient", 3);
+    } finally {
+      setLoading(false);
     }
   };
+
+  console.log('showOtherField: ', showOtherField);
 
   return (
     <Form
@@ -223,9 +274,48 @@ useEffect(() => {
           <Form.Item
             label="Illness Type"
             name="illnessType"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true, message: "Please select an illness type" },
+            ]}
           >
-            <Input size="large" />
+            <Select
+              size="large"
+              placeholder="Select an illness type"
+              style={{ width: "100%" }}
+              onChange={(value) => setShowOtherField(value === "Other")}
+            >
+              {illnessOptions
+                .filter((item) => item.label !== "All")
+                .map((item) => (
+                  <Select.Option key={item.key} value={item.label}>
+                    {item.label}
+                  </Select.Option>
+                ))}
+            </Select>
+          </Form.Item>
+
+          {showOtherField && (
+            <Form.Item
+              label="Specify Illness"
+              name="otherIllness"
+              rules={[{ required: true, message: "Please specify the illness" }]}
+            >
+              <Input size="large" placeholder="Enter illness name" />
+            </Form.Item>
+          )}
+
+          <Form.Item
+            label="Severity Level"
+            name="severityLevel"
+            rules={[{ required: true, message: "Please select a severity level" }]}
+            >
+            <Radio.Group
+              block
+              options={severityOptions}
+              defaultValue="Mild"
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
 
           <Form.Item
@@ -271,7 +361,7 @@ useEffect(() => {
           </Form.Item>
 
           <Form.Item label="Hospital Fee" name="hospitalFee">
-            <Input size="large" disabled />
+            <Input size="large" readOnly />
           </Form.Item>
         </Col>
 

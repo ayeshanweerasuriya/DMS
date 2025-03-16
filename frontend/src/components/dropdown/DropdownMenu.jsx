@@ -8,8 +8,9 @@ export function DropdownMenu({
   items,
   defaultLabel = "Sort by:",
   onItemSelect = () => {},
+  defaultOption = null,
 }) {
-  const [selectedLabel, setSelectedLabel] = useState("");
+  const [selectedLabel, setSelectedLabel] = useState(defaultOption || "Select an option");
 
   const handleMenuClick = (e) => {
     const selectedItem = items.find((item) => item.key === e.key);
@@ -17,9 +18,8 @@ export function DropdownMenu({
       const label = selectedItem.label.props
         ? selectedItem.label.props.children
         : selectedItem.label;
-      setSelectedLabel(label);
+      setSelectedLabel(label); // Update state to reflect selected item
 
-      // Call the onItemSelect callback if provided
       if (onItemSelect) {
         onItemSelect(selectedItem);
       }
@@ -27,24 +27,14 @@ export function DropdownMenu({
   };
 
   return (
-    <Dropdown menu={{ items, onClick: handleMenuClick }}>
+    <Dropdown className="dropdown" menu={{ items, onClick: handleMenuClick }}>
       <Button className="dropdown-button">
         <Space>
           <span className="default-label">{defaultLabel}</span>{" "}
-          {/* Always displayed label */}
-          <span className="selected-label">
-            {selectedLabel || "Select an option"}
-          </span>{" "}
-          {/* Dynamic selected label */}
+          <span className="selected-label">{selectedLabel}</span>{" "}
           <DownOutlined />
         </Space>
       </Button>
     </Dropdown>
   );
 }
-
-DropdownMenu.propTypes = {
-  items: PropTypes.array.isRequired,
-  defaultLabel: PropTypes.string,
-  onItemSelect: PropTypes.func,
-};

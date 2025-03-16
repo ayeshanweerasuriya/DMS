@@ -13,17 +13,21 @@ import { login } from "../../apiService";
 import { Message } from "../../components/message/Message";
 
 export function LogIn() {
-  const [buttonState, setButtonState] = useState(true);
+  // const [buttonState, setButtonState] = useState(true);
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
     try {
       const data = await login(values.username, values.password);
-      console.log("data: ", data);
       if (data.status === 200 && data.token) {
         Message("success", "Login successful", 2);
         setTimeout(() => {
-          navigate("/appointments", { replace: true });
+          if (data.role === "Doctor") {
+            navigate("/view-records");
+          } else {
+            navigate("/appointments");
+          }
+          window.location.reload(); 
         }, 2000);
       } else {
         Message("error", "Invalid username or password", 5);
@@ -37,23 +41,30 @@ export function LogIn() {
   return (
     <div className="login-component">
       <div className="logo-name">
-        <img src="/login/logo.png" alt="logo" />
-        <h1>{"-DentalEase-"}</h1>
-        <h2>{"Dental Management System"}</h2>
+        <img src="/login/logo.png" alt="DentalEase Logo" className="logo-img" />
+        <h1 className="logo-title">DentalEase</h1>
+        <h2 className="logo-subtitle">Dental Management System</h2>
       </div>
       <div className="login">
-        <h3>Choose your account type</h3>
+        <h3 className="form-heading">Choose your account type</h3>
         <div style={{ display: "flex", marginTop: "10px" }}>
           <div
             className="block"
-            onClick={() => setButtonState(false)}
+            // onClick={() => setButtonState(false)}
             style={{
               marginRight: "2.5px",
-              backgroundColor: buttonState ? "#8eaad4" : "#4187f0",
-              color: buttonState ? "#000" : "#fff",
+              // backgroundColor: buttonState ? "#8eaad4" : "#4187f0",
+              // color: buttonState ? "#000" : "#fff",
+              backgroundColor: "#4187f0",
+              color: "#fff",
             }}
           >
-            <img src="/login/staff.svg" alt="staff" style={{borderColor: "#fff"}}/>
+            <img
+              src="/login/staff.svg"
+              height={"150px"}
+              width={"125px"}
+              alt="staff"
+            />
             <p className="block-text">Staff</p>
           </div>
           <div className="or-container">
@@ -61,14 +72,21 @@ export function LogIn() {
           </div>
           <div
             className="block"
-            onClick={() => setButtonState(true)}
+            // onClick={() => setButtonState(true)}
             style={{
               marginLeft: "2.5px",
-              backgroundColor: buttonState ? "#4187f0" : "#8eaad4",
-              color: buttonState ? "#fff" : "#000",
+              // backgroundColor: buttonState ? "#4187f0" : "#8eaad4",
+              // color: buttonState ? "#fff" : "#000",
+              backgroundColor: "#4187f0",
+              color: "#fff",
             }}
           >
-            <img src="/login/doctor.svg" alt="doctor" />
+            <img
+              src="/login/doctor.svg"
+              height={"150px"}
+              width={"125px"}
+              alt="doctor"
+            />
             <p className="block-text">Doctor</p>
           </div>
         </div>
